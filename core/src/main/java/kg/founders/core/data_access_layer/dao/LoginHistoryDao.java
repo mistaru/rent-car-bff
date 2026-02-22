@@ -1,9 +1,9 @@
 package kg.founders.core.data_access_layer.dao;
 
-import kg.founders.core.entity.LogisticLoginHistory;
+import kg.founders.core.entity.LoginHistory;
 
 public interface LoginHistoryDao {
-    void save(LogisticLoginHistory logisticLoginHistory);
+    void save(LoginHistory loginHistory);
 
     boolean isLoginAttemptsExceeded(String login, Integer maxLoginAttempts);
 

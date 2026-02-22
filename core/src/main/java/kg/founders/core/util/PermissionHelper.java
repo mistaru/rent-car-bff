@@ -1,6 +1,6 @@
 package kg.founders.core.util;
 
-import kg.founders.core.entity.auth.LogisticAuth;
+import kg.founders.core.entity.auth.Auth;
 import kg.founders.core.exceptions.ForbiddenException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -8,19 +8,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class PermissionHelper {
 
-    public LogisticAuth getCurrentPrincipal() {
+    public Auth getCurrentPrincipal() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if (principal instanceof LogisticAuth) {
-            return (LogisticAuth) principal;
+        if (principal instanceof Auth) {
+            return (Auth) principal;
         } else {
             throw new ForbiddenException();
         }
     }
 
     public boolean isAdmin() {
-        return getCurrentPrincipal().getLogisticAuthRoles().stream()
-                .anyMatch(role -> "admin".equalsIgnoreCase(role.getLogisticRole().getName()));
+        return getCurrentPrincipal().getAuthRoles().stream()
+                .anyMatch(role -> "admin".equalsIgnoreCase(role.getRole().getName()));
     }
 
     public Long currentUserId() {

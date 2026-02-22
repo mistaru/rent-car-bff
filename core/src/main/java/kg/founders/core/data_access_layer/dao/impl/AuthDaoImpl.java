@@ -1,7 +1,7 @@
 package kg.founders.core.data_access_layer.dao.impl;
 
 import kg.founders.core.data_access_layer.dao.AuthDao;
-import kg.founders.core.entity.auth.LogisticAuth;
+import kg.founders.core.entity.auth.Auth;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,11 +20,11 @@ public class AuthDaoImpl implements AuthDao {
 
     @Override
     public boolean blockAuth(String username, boolean block) {
-        return jdbcTemplate.update("UPDATE " + LogisticAuth.TABLE_NAME + " SET BLOCKED = ? WHERE USERNAME = ?", block ? new Timestamp(System.currentTimeMillis()) : null, username) == 1;
+        return jdbcTemplate.update("UPDATE " + Auth.TABLE_NAME + " SET BLOCKED = ? WHERE USERNAME = ?", block ? new Timestamp(System.currentTimeMillis()) : null, username) == 1;
     }
 
     @Override
     public Boolean isBlocked(Long id) {
-        return jdbcTemplate.queryForObject("SELECT BLOCKED IS NOT NULL FROM " + LogisticAuth.TABLE_NAME + " WHERE ID = ?", Boolean.class, id);
+        return jdbcTemplate.queryForObject("SELECT BLOCKED IS NOT NULL FROM " + Auth.TABLE_NAME + " WHERE ID = ?", Boolean.class, id);
     }
 }

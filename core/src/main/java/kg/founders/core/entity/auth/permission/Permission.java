@@ -4,7 +4,7 @@ import kg.founders.core.entity.BaseEntity;
 import kg.founders.core.enums.permission.PermissionType;
 import kg.founders.core.model.audit.IdBased;
 import kg.founders.core.util.SqlTable;
-import kg.founders.core.model.auth.role.permission.LogisticPermissionModel;
+import kg.founders.core.model.auth.role.permission.PermissionModel;
 import kg.founders.core.settings.security.permission.AccessPermission;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -16,12 +16,12 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = LogisticPermission.TABLE_NAME)
+@Table(name = Permission.TABLE_NAME)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LogisticPermission extends BaseEntity implements IdBased {
+public class Permission extends BaseEntity implements IdBased {
 
     @SqlTable
-    public static final String TABLE_NAME = "LOGISTIC_PERMISSIONS";
+    public static final String TABLE_NAME = "PERMISSIONS";
     public static final String SEQ_NAME = TABLE_NAME + "_SEQ";
 
     @Id
@@ -36,12 +36,12 @@ public class LogisticPermission extends BaseEntity implements IdBased {
     @Column(length = 512, nullable = false)
     String description;
 
-    public LogisticPermission(Long id) {
+    public Permission(Long id) {
         this.id = id;
     }
 
-    public LogisticPermissionModel toModel(AccessPermission accessPermission) {
-        return new LogisticPermissionModel(
+    public PermissionModel toModel(AccessPermission accessPermission) {
+        return new PermissionModel(
                 getId(),
                 getName(),
                 accessPermission.getAccess()

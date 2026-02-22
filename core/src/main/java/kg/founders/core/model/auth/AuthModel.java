@@ -1,7 +1,7 @@
 package kg.founders.core.model.auth;
 
 import kg.founders.core.model.audit.IdBased;
-import kg.founders.core.model.auth.role.LogisticRoleModel;
+import kg.founders.core.model.auth.role.RoleModel;
 import kg.founders.core.util.ChainValidator;
 import kg.founders.core.util.Validatable;
 import lombok.AccessLevel;
@@ -17,12 +17,12 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LogisticAuthModel implements IdBased, Validatable {
+public class AuthModel implements IdBased, Validatable {
     Long id;
     String username;
     String password;
     Timestamp blocked;
-    Set<LogisticRoleModel> roles;
+    Set<RoleModel> roles;
 
     @Override
     public String validateMessage() {

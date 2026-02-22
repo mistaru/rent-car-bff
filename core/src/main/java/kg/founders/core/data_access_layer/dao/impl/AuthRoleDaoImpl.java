@@ -1,7 +1,7 @@
 package kg.founders.core.data_access_layer.dao.impl;
 
 import kg.founders.core.data_access_layer.dao.AuthRoleDao;
-import kg.founders.core.entity.auth.role.LogisticAuthRole;
+import kg.founders.core.entity.auth.role.AuthRole;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,7 +20,7 @@ public class AuthRoleDaoImpl implements AuthRoleDao {
 
     @Override
     public void updateActiveRole(Long authId, Long roleId) {
-        jdbcTemplate.update("UPDATE " + LogisticAuthRole.TABLE_NAME + " SET ACTIVE = (LOGISTIC_ROLE_ID = ?) " +
+        jdbcTemplate.update("UPDATE " + AuthRole.TABLE_NAME + " SET ACTIVE = (LOGISTIC_ROLE_ID = ?) " +
                         " WHERE LOGISTIC_AUTH_ID = ?"
                 , roleId, authId);
     }

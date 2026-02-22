@@ -1,7 +1,7 @@
 package kg.founders.core.services.impl.auth.role.permission;
 
 import kg.founders.core.data_access_layer.repo.permission.RolePermissionRepo;
-import kg.founders.core.entity.auth.permission.LogisticRolePermission;
+import kg.founders.core.entity.auth.permission.RolePermission;
 import kg.founders.core.services.auth.role.permission.RolePermissionService;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,12 +19,12 @@ public class RolePermissionServiceImpl implements RolePermissionService {
     RolePermissionRepo repo;
 
     @Override
-    public void saveAll(List<LogisticRolePermission> logisticRolePermissions) {
-        repo.saveAll(logisticRolePermissions);
+    public void saveAll(List<RolePermission> rolePermissions) {
+        repo.saveAll(rolePermissions);
     }
 
     @Override
-    public void deleteAll(List<LogisticRolePermission> logisticRolePermissions) {
-        repo.deleteAll(logisticRolePermissions);
+    public void deleteAll(List<RolePermission> rolePermissions) {
+        repo.deleteAll(rolePermissions);
     }
 }

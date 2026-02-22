@@ -1,27 +1,26 @@
 package kg.founders.core.entity;
 
+import kg.founders.core.entity.auth.Auth;
 import kg.founders.core.model.audit.IdBased;
 import kg.founders.core.util.SqlTable;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.sql.Timestamp;
 
-@Entity
 @Getter
 @Setter
+@Entity
 @ToString
-@AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
-@Table(name = LogisticLoginHistory.TABLE_NAME , indexes = {@Index(columnList = "login")})
+@AllArgsConstructor
+@Table(name = OldPassword.TABLE_NAME)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LogisticLoginHistory implements IdBased, Serializable {
-
+@EntityListeners(AuditingEntityListener.class)
+public class OldPassword extends BaseEntity implements IdBased {
     @SqlTable
-    public static final String TABLE_NAME = "LOGISTIC_LOGIN_HISTORY";
+    public static final String TABLE_NAME = "OLD_PASSWORDS";
     public static final String SEQ_NAME = TABLE_NAME + "_SEQ";
 
     @Id
@@ -29,9 +28,9 @@ public class LogisticLoginHistory implements IdBased, Serializable {
     @GeneratedValue(generator = SEQ_NAME)
     Long id;
 
-    Timestamp cdt;
+    String password;
 
-    String login;
-
-    String ip;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    Auth auth;
 }

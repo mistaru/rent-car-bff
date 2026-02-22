@@ -1,6 +1,6 @@
 package kg.founders.bff.config.settings;
 
-import kg.founders.core.entity.auth.LogisticAuth;
+import kg.founders.core.entity.auth.Auth;
 import kg.founders.core.enums.permission.PermissionType;
 import kg.founders.core.settings.security.permission.ImmutableAccessPermission;
 import lombok.AccessLevel;
@@ -18,7 +18,7 @@ import java.util.Optional;
 @EqualsAndHashCode(callSuper = false)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TokenContextHolder extends AbstractAuthenticationToken {
-    LogisticAuth principal;
+    Auth principal;
     Object credentials;
 
     @Getter
@@ -33,7 +33,7 @@ public class TokenContextHolder extends AbstractAuthenticationToken {
         setAuthenticated(false);
     }
 
-    TokenContextHolder(String token, LogisticAuth principal) {
+    TokenContextHolder(String token, Auth principal) {
         super(principal.getAuthorities());
         this.principal = principal;
         this.credentials = token;
@@ -46,7 +46,7 @@ public class TokenContextHolder extends AbstractAuthenticationToken {
     }
 
     @Override
-    public LogisticAuth getPrincipal() {
+    public Auth getPrincipal() {
         return principal;
     }
 

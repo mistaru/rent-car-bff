@@ -6,13 +6,13 @@ import kg.founders.bff.config.response.ResponseMessage;
 import kg.founders.bff.config.response.ResultCode;
 import kg.founders.bff.config.settings.TokenContextHolder;
 import kg.founders.bff.config.settings.perms.PermissionValidation;
-import kg.founders.core.entity.auth.LogisticAuth;
+import kg.founders.core.entity.auth.Auth;
 import kg.founders.core.enums.permission.AccessType;
 import kg.founders.core.enums.permission.PermissionType;
 import kg.founders.core.exceptions.ForbiddenException;
 import kg.founders.core.exceptions.UserNotFoundException;
 import kg.founders.core.model.audit.AuditModel;
-import kg.founders.core.model.auth.LogisticAuthModel;
+import kg.founders.core.model.auth.AuthModel;
 import kg.founders.core.model.login.LoginModel;
 import kg.founders.core.model.login.PasswordChangeModel;
 import kg.founders.core.services.auth.AuthService;
@@ -66,7 +66,7 @@ public class AuthControllerRest {
 
     @ManualPermissionControl
     @GetMapping("/auth/current")
-    public LogisticAuthModel current() {
+    public AuthModel current() {
         return TokenContextHolder.currentOptional().map(
                 context -> {
                     var auth = context.getPrincipal();
@@ -93,9 +93,9 @@ public class AuthControllerRest {
     @PostMapping(value = "/auth/password")
     public ResponseMessage<String> changePassword(@RequestBody PasswordChangeModel model) {
         try {
-            LogisticAuth logisticAuth = TokenContextHolder.currentOptional().orElseThrow(ForbiddenException::new).getPrincipal();
+            Auth auth = TokenContextHolder.currentOptional().orElseThrow(ForbiddenException::new).getPrincipal();
             authService.updatePassword(
-                    logisticAuth,
+                    auth,
                     model,
                     auditorAware.getCurrentAuditor().orElseThrow(ForbiddenException::new)
             );
@@ -109,7 +109,7 @@ public class AuthControllerRest {
     @PostMapping(value = "/auth")
     @HasPermission(PermissionType.AUTH)
     @HasAccess({AccessType.CREATE, AccessType.UPDATE})
-    public ResponseMessage<String> create(@RequestBody LogisticAuthModel model) {
+    public ResponseMessage<String> create(@RequestBody AuthModel model) {
         try {
             PermissionValidation.validateCreateUpdate(model);
             authService.save(model);
@@ -150,7 +150,7 @@ public class AuthControllerRest {
     @ManualPermissionControl
     @HasPermission(PermissionType.AUTH)
     @HasAccess({AccessType.READ})
-    public ResponseMessage<List<LogisticAuthModel>> findAll() {
+    public ResponseMessage<List<AuthModel>> findAll() {
         try {
             return new ResponseMessage<>(authService.findAll(), ResultCode.OK);
         } catch (Exception e) {

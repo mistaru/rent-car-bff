@@ -4,13 +4,13 @@ import com.google.common.base.Strings;
 import com.lambdaworks.crypto.SCryptUtil;
 import kg.founders.core.data_access_layer.dao.AuthDao;
 import kg.founders.core.data_access_layer.repo.auth.AuthRepo;
-import kg.founders.core.entity.LogisticOldPassword;
-import kg.founders.core.entity.auth.LogisticAuth;
-import kg.founders.core.entity.auth.role.LogisticRole;
+import kg.founders.core.entity.OldPassword;
+import kg.founders.core.entity.auth.Auth;
+import kg.founders.core.entity.auth.role.Role;
 import kg.founders.core.exceptions.NotFoundException;
 import kg.founders.core.exceptions.ValidationException;
 import kg.founders.core.model.audit.AuditModel;
-import kg.founders.core.model.auth.LogisticAuthModel;
+import kg.founders.core.model.auth.AuthModel;
 import kg.founders.core.model.login.PasswordChangeModel;
 import kg.founders.core.services.OldPasswordService;
 import kg.founders.core.services.auth.AuthService;
@@ -44,12 +44,12 @@ public class AuthServiceImpl implements AuthService {
     static Integer PASSWORD_EXPIRATION_DAYS = 30;
 
     @Override
-    public Optional<LogisticAuth> findByUsername(String username) {
+    public Optional<Auth> findByUsername(String username) {
         return repo.findByUsername(username);
     }
 
     @Override
-    public Optional<LogisticAuth> findById(Long authId) {
+    public Optional<Auth> findById(Long authId) {
         return repo.findById(authId);
     }
 
@@ -66,35 +66,35 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public void updatePassword(LogisticAuth logisticAuth, PasswordChangeModel model, AuditModel auditModel) {
+    public void updatePassword(Auth auth, PasswordChangeModel model, AuditModel auditModel) {
         model.validate();
 
-        if (Strings.isNullOrEmpty(logisticAuth.getPassword()) || !SCryptUtil.check(model.getCurrentPassword(), logisticAuth.getPassword())) {
+        if (Strings.isNullOrEmpty(auth.getPassword()) || !SCryptUtil.check(model.getCurrentPassword(), auth.getPassword())) {
             throw new ValidationException("Неверно указан текущий пароль");
         }
 
-        oldPasswordService.save(new LogisticOldPassword(null, logisticAuth.getPassword(), logisticAuth));
+        oldPasswordService.save(new OldPassword(null, auth.getPassword(), auth));
 
-        if (oldPasswordService.getLast5RowsByAuthId(logisticAuth.getId()).stream().anyMatch(
+        if (oldPasswordService.getLast5RowsByAuthId(auth.getId()).stream().anyMatch(
                 oldPassword -> SCryptUtil.check(model.getNewPassword(), oldPassword.getPassword()))) {
             throw new ValidationException("Пароль не должен совпадать с 5 прeдыдущими!");
         }
 
-        logisticAuth.setPassword(hashPassword(model.getNewPassword()));
-        logisticAuth.addToTheExpireDateDays(PASSWORD_EXPIRATION_DAYS);
+        auth.setPassword(hashPassword(model.getNewPassword()));
+        auth.addToTheExpireDateDays(PASSWORD_EXPIRATION_DAYS);
 
-        save(logisticAuth);
+        save(auth);
     }
 
     @Override
     @Transactional
-    public LogisticAuth save(LogisticAuthModel model) {
+    public Auth save(AuthModel model) {
         model.validate();
 
-        var logisticAuth = model.getId() == null ? new LogisticAuth() : findById(model.getId())
+        var logisticAuth = model.getId() == null ? new Auth() : findById(model.getId())
                 .orElseThrow(() -> new NotFoundException(String.format("Учетная запись с id клиента %s не найдена", model.getId())));
 
-        List<LogisticRole> roles = model.getRoles()
+        List<Role> roles = model.getRoles()
                 .stream()
                 .map(roleModel -> roleService.findById(roleModel.getId())
                         .orElseThrow(ValidationException.fromMessage("Роль не существует")))
@@ -109,14 +109,14 @@ public class AuthServiceImpl implements AuthService {
         }
         var savedAuth = save(logisticAuth);
 
-        savedAuth.setLogisticAuthRoles(Set.copyOf(authRoleService.saveAllByAuthId(savedAuth, roles)));
+        savedAuth.setAuthRoles(Set.copyOf(authRoleService.saveAllByAuthId(savedAuth, roles)));
 
         return savedAuth;
     }
 
     @Override
-    public LogisticAuth save(LogisticAuth logisticAuth) {
-        return repo.save(logisticAuth);
+    public Auth save(Auth auth) {
+        return repo.save(auth);
     }
 
     @Override
@@ -130,15 +130,15 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LogisticAuthModel toModel(LogisticAuth logisticAuth) {
-        return new LogisticAuthModel(
-                logisticAuth.getId(),
-                logisticAuth.getUsername(),
+    public AuthModel toModel(Auth auth) {
+        return new AuthModel(
+                auth.getId(),
+                auth.getUsername(),
                 null,
-                logisticAuth.getBlocked(),
-                logisticAuth.getLogisticAuthRoles().stream()
+                auth.getBlocked(),
+                auth.getAuthRoles().stream()
                         .map(authRole -> {
-                            var roleModel = authRole.getLogisticRole().toModel();
+                            var roleModel = authRole.getRole().toModel();
                             roleModel.setActive(authRole.getActive());
                             return roleModel;
                         })
@@ -152,7 +152,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public List<LogisticAuthModel> findAll() {
+    public List<AuthModel> findAll() {
         return repo.findAllByRdtIsNull().stream().map(this::toModel).collect(Collectors.toList());
     }
 

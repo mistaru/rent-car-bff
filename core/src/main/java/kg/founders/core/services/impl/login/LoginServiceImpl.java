@@ -4,7 +4,7 @@ package kg.founders.core.services.impl.login;
 import com.google.common.base.Strings;
 import com.lambdaworks.crypto.SCryptUtil;
 import kg.founders.core.exceptions.*;
-import kg.founders.core.entity.auth.LogisticAuth;
+import kg.founders.core.entity.auth.Auth;
 import kg.founders.core.model.login.LoginModel;
 import kg.founders.core.services.auth.AuthService;
 import kg.founders.core.services.login.LoginService;
@@ -42,27 +42,27 @@ public class LoginServiceImpl implements LoginService {
     public String login(LoginModel loginModel, String ip) {
         log.info("login(): with username '{}', ip: '{}'", loginModel.getUsername(), ip);
         try {
-            LogisticAuth logisticAuth = verify(loginModel.getUsername(), loginModel.getPassword());
-            return generateJwtCode(logisticAuth);
+            Auth auth = verify(loginModel.getUsername(), loginModel.getPassword());
+            return generateJwtCode(auth);
         } catch (BaseException e) {
             loginHistoryService.save(ip, loginModel.getUsername());
             throw e;
         }
     }
 
-    private String generateJwtCode(LogisticAuth logisticAuth) {
+    private String generateJwtCode(Auth auth) {
         return jwt.sign(
-                logisticAuth.getUsername(),
-                logisticAuth.getPassword()
+                auth.getUsername(),
+                auth.getPassword()
         );
     }
 
-    private LogisticAuth verify(String username, String password) {
+    private Auth verify(String username, String password) {
         if (Strings.isNullOrEmpty(username)) throw new EmptyUsernameException();
 
         if (Strings.isNullOrEmpty(password)) throw new EmptyPasswordException();
 
-        Optional<LogisticAuth> entity = authService.findByUsername(username);
+        Optional<Auth> entity = authService.findByUsername(username);
 
         return entity.map(
                         auth -> {
@@ -76,8 +76,8 @@ public class LoginServiceImpl implements LoginService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
-    private void checkAuthForBlock(String username, LogisticAuth logisticAuth) {
-        if (logisticAuth.getBlocked() != null || logisticAuth.getRdt() != null) {
+    private void checkAuthForBlock(String username, Auth auth) {
+        if (auth.getBlocked() != null || auth.getRdt() != null) {
             throw new UserNotFoundException();
         }
 
@@ -95,21 +95,21 @@ public class LoginServiceImpl implements LoginService {
         }
     }
 
-    private void checkPasswordExpiration(LogisticAuth logisticAuth) {
-        if (logisticAuth.getPasswordExpireDate() != null && logisticAuth.getPasswordExpireDate().before(new Timestamp(System.currentTimeMillis()))) {
+    private void checkPasswordExpiration(Auth auth) {
+        if (auth.getPasswordExpireDate() != null && auth.getPasswordExpireDate().before(new Timestamp(System.currentTimeMillis()))) {
             throw new PasswordExpirationException("Срок годности пароля истек, просьба обновить пароль!");
         }
     }
 
     @Override
-    public LogisticAuth authFromToken(String token) {
+    public Auth authFromToken(String token) {
 
         String username = jwt.getUsername(token);
 
         var auth = authService.findByUsername(username).orElseThrow(UserNotFoundException::new);
         if (auth.getBlocked() != null || auth.getRdt() != null) throw new UserNotFoundException();
 
-        auth.setLogisticAuthRoles(auth.getLogisticAuthRoles());
+        auth.setAuthRoles(auth.getAuthRoles());
         return auth;
     }
 

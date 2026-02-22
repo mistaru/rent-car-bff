@@ -1,13 +1,13 @@
 package kg.founders.core.services.auth.role.permission;
 
 
-import kg.founders.core.entity.auth.permission.LogisticRolePermission;
+import kg.founders.core.entity.auth.permission.RolePermission;
 
 import java.util.List;
 
 public interface RolePermissionService {
 
-    void saveAll(List<LogisticRolePermission> logisticRolePermissions);
+    void saveAll(List<RolePermission> rolePermissions);
 
-    void deleteAll(List<LogisticRolePermission> logisticRolePermissions);
+    void deleteAll(List<RolePermission> rolePermissions);
 }

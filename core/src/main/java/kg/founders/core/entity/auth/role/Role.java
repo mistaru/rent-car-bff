@@ -1,11 +1,11 @@
 package kg.founders.core.entity.auth.role;
 
 import kg.founders.core.entity.BaseEntity;
-import kg.founders.core.entity.auth.permission.LogisticRolePermission;
+import kg.founders.core.entity.auth.permission.RolePermission;
 import kg.founders.core.model.audit.IdBased;
 import kg.founders.core.util.SqlTable;
-import kg.founders.core.model.auth.role.LogisticRoleModel;
-import kg.founders.core.model.auth.role.permission.LogisticPermissionModel;
+import kg.founders.core.model.auth.role.RoleModel;
+import kg.founders.core.model.auth.role.permission.PermissionModel;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -21,13 +21,13 @@ import java.util.stream.Collectors;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = LogisticRole.TABLE_NAME)
+@Table(name = Role.TABLE_NAME)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EntityListeners(AuditingEntityListener.class)
-public class LogisticRole extends BaseEntity implements IdBased {
+public class Role extends BaseEntity implements IdBased {
 
     @SqlTable
-    public static final String TABLE_NAME = "LOGISTIC_ROLES";
+    public static final String TABLE_NAME = "ROLES";
     public static final String SEQ_NAME = TABLE_NAME + "_SEQ";
 
     @Id
@@ -41,29 +41,29 @@ public class LogisticRole extends BaseEntity implements IdBased {
     @Column(length = 1000)
     String description;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "logisticRole")
-    List<LogisticRolePermission> logisticRolePermissions;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "role")
+    List<RolePermission> rolePermissions;
 
-    public LogisticRole(Long id) {
+    public Role(Long id) {
         this.id = id;
     }
 
-    public LogisticRoleModel toModel() {
-        List<LogisticPermissionModel> logisticPermissionModels = Collections.emptyList();
+    public RoleModel toModel() {
+        List<PermissionModel> permissionModels = Collections.emptyList();
 
-        var permissions = getLogisticRolePermissions();
+        var permissions = getRolePermissions();
 
         if (permissions != null) {
-            logisticPermissionModels = permissions.stream()
-                    .map(p -> p.getLogisticPermission().toModel(p))
+            permissionModels = permissions.stream()
+                    .map(p -> p.getPermission().toModel(p))
                     .collect(Collectors.toList());
         }
 
-        return LogisticRoleModel.builder()
+        return RoleModel.builder()
                 .id(this.id)
                 .name(this.name)
                 .description(this.description)
-                .permissions(logisticPermissionModels)
+                .permissions(permissionModels)
                 .build();
     }
 }

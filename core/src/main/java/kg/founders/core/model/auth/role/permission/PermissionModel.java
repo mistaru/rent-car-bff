@@ -1,6 +1,6 @@
 package kg.founders.core.model.auth.role.permission;
 
-import kg.founders.core.entity.auth.permission.LogisticPermission;
+import kg.founders.core.entity.auth.permission.Permission;
 import kg.founders.core.enums.permission.PermissionType;
 import kg.founders.core.settings.security.permission.AccessPermission;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LogisticPermissionModel implements AccessPermission {
+public class PermissionModel implements AccessPermission {
     Long id;
     PermissionType name;
     int access;
@@ -20,7 +20,7 @@ public class LogisticPermissionModel implements AccessPermission {
         return access;
     }
 
-    public LogisticPermission fromModel() {
-        return new LogisticPermission(getId());
+    public Permission fromModel() {
+        return new Permission(getId());
     }
 }

@@ -1,9 +1,9 @@
 package kg.founders.core.entity.auth;
 
 import kg.founders.core.entity.BaseEntity;
-import kg.founders.core.entity.auth.role.LogisticAuthRole;
+import kg.founders.core.entity.auth.role.AuthRole;
 import kg.founders.core.entity.auth.permission.GrantHolder;
-import kg.founders.core.entity.auth.permission.LogisticRolePermission;
+import kg.founders.core.entity.auth.permission.RolePermission;
 import kg.founders.core.model.audit.AuditModel;
 import kg.founders.core.model.audit.CreatedByDetails;
 import kg.founders.core.model.audit.IdBased;
@@ -30,13 +30,13 @@ import java.util.stream.Collectors;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = LogisticAuth.TABLE_NAME)
+@Table(name = Auth.TABLE_NAME)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EntityListeners(AuditingEntityListener.class)
-public class LogisticAuth extends BaseEntity implements UserDetails, IdBased {
+public class Auth extends BaseEntity implements UserDetails, IdBased {
 
     @SqlTable
-    public static final String TABLE_NAME = "LOGISTIC_AUTH";
+    public static final String TABLE_NAME = "AUTH";
     public static final String SEQ_NAME = TABLE_NAME + "_SEQ";
 
     @Id
@@ -51,8 +51,8 @@ public class LogisticAuth extends BaseEntity implements UserDetails, IdBased {
 
     Timestamp blocked;
 
-    @OneToMany(mappedBy = "logisticAuth", fetch = FetchType.EAGER)
-    Set<LogisticAuthRole> logisticAuthRoles;
+    @OneToMany(mappedBy = "auth", fetch = FetchType.EAGER)
+    Set<AuthRole> authRoles;
 
     @LastModifiedDate
     Timestamp lastActivity;
@@ -62,11 +62,11 @@ public class LogisticAuth extends BaseEntity implements UserDetails, IdBased {
     @Transient
     transient Collection<GrantHolder> authorities;
 
-    public LogisticAuth(Long id) {
+    public Auth(Long id) {
         this.id = id;
     }
 
-    public LogisticAuth(
+    public Auth(
             Long id,
             String username,
             String password,
@@ -76,17 +76,17 @@ public class LogisticAuth extends BaseEntity implements UserDetails, IdBased {
             Timestamp cdt,
             Timestamp mdt,
             Timestamp rdt,
-            Set<LogisticAuthRole> roles
+            Set<AuthRole> roles
     ) {
         super(createdBy, modifiedBy, cdt, mdt, rdt);
         this.id = id;
         this.username = username;
         this.password = password;
         this.lastActivity = lastActivity;
-        setLogisticAuthRoles(roles);
+        setAuthRoles(roles);
     }
 
-    public LogisticAuth(
+    public Auth(
             Long id,
             String username,
             String password,
@@ -97,7 +97,7 @@ public class LogisticAuth extends BaseEntity implements UserDetails, IdBased {
             Timestamp cdt,
             Timestamp mdt,
             Timestamp rdt,
-            Set<LogisticAuthRole> roles
+            Set<AuthRole> roles
     ) {
         super(createdBy, modifiedBy, cdt, mdt, rdt);
         this.id = id;
@@ -105,16 +105,16 @@ public class LogisticAuth extends BaseEntity implements UserDetails, IdBased {
         this.password = password;
         this.blocked = blocked;
         this.lastActivity = lastActivity;
-        setLogisticAuthRoles(roles);
+        setAuthRoles(roles);
     }
 
-    public void setLogisticAuthRoles(Set<LogisticAuthRole> logisticAuthRoles) {
-        this.logisticAuthRoles = logisticAuthRoles;
+    public void setAuthRoles(Set<AuthRole> authRoles) {
+        this.authRoles = authRoles;
 
-        this.authorities = logisticAuthRoles == null ? Collections.emptySet() : logisticAuthRoles.stream()
-                .filter(LogisticAuthRole::getActive)
-                .flatMap(logisticAuthRole -> logisticAuthRole.getLogisticRole().getLogisticRolePermissions().stream())
-                .map(LogisticRolePermission::toGrantHolder)
+        this.authorities = authRoles == null ? Collections.emptySet() : authRoles.stream()
+                .filter(AuthRole::getActive)
+                .flatMap(logisticAuthRole -> logisticAuthRole.getRole().getRolePermissions().stream())
+                .map(RolePermission::toGrantHolder)
                 .collect(Collectors.toSet());
     }
 

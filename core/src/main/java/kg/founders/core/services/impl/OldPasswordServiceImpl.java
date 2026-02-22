@@ -1,6 +1,6 @@
 package kg.founders.core.services.impl;
 
-import kg.founders.core.entity.LogisticOldPassword;
+import kg.founders.core.entity.OldPassword;
 import kg.founders.core.repo.OldPasswordRepo;
 import kg.founders.core.services.OldPasswordService;
 import lombok.AllArgsConstructor;
@@ -20,12 +20,12 @@ public class OldPasswordServiceImpl implements OldPasswordService {
     OldPasswordRepo repo;
 
     @Override
-    public LogisticOldPassword save(LogisticOldPassword logisticOldPassword) {
-        return repo.save(logisticOldPassword);
+    public OldPassword save(OldPassword oldPassword) {
+        return repo.save(oldPassword);
     }
 
     @Override
-    public List<LogisticOldPassword> getLast5RowsByAuthId(Long authId) {
-        return repo.findTop5ByLogisticAuthIdOrderByIdDesc(authId);
+    public List<OldPassword> getLast5RowsByAuthId(Long authId) {
+        return repo.findTop5ByAuthIdOrderByIdDesc(authId);
     }
 }

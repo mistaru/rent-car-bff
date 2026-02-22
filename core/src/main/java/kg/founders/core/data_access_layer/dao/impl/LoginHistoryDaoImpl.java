@@ -1,7 +1,7 @@
 package kg.founders.core.data_access_layer.dao.impl;
 
 import kg.founders.core.data_access_layer.dao.LoginHistoryDao;
-import kg.founders.core.entity.LogisticLoginHistory;
+import kg.founders.core.entity.LoginHistory;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -15,10 +15,10 @@ public class LoginHistoryDaoImpl implements LoginHistoryDao {
     JdbcTemplate jdbc;
 
     @Override
-    public void save(LogisticLoginHistory logisticLoginHistory) {
-        jdbc.update("insert into " + LogisticLoginHistory.TABLE_NAME + " (id, cdt, ip, login)" +
+    public void save(LoginHistory loginHistory) {
+        jdbc.update("insert into " + LoginHistory.TABLE_NAME + " (id, cdt, ip, login)" +
                         " values (NEXTVAL('logistic_login_history_seq'), ?, ?, ?);"
-                , logisticLoginHistory.getCdt(), logisticLoginHistory.getIp(), logisticLoginHistory.getLogin());
+                , loginHistory.getCdt(), loginHistory.getIp(), loginHistory.getLogin());
     }
 
     @Override
@@ -28,13 +28,13 @@ public class LoginHistoryDaoImpl implements LoginHistoryDao {
                 "        WHEN COUNT(*) > ? THEN 1 " +
                 "        ELSE 0 " +
                 "    END AS exceeded " +
-                " FROM " + LogisticLoginHistory.TABLE_NAME +
+                " FROM " + LoginHistory.TABLE_NAME +
                 " WHERE login = ? ", Boolean.class, maxLoginAttempts, login);
         return result != null && result;
     }
 
     @Override
     public void deleteAllByLogin(String login) {
-        jdbc.update("delete from " + LogisticLoginHistory.TABLE_NAME + " where login = ?", login);
+        jdbc.update("delete from " + LoginHistory.TABLE_NAME + " where login = ?", login);
     }
 }

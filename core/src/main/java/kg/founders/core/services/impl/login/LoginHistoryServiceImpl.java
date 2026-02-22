@@ -1,7 +1,7 @@
 package kg.founders.core.services.impl.login;
 
 import kg.founders.core.data_access_layer.dao.LoginHistoryDao;
-import kg.founders.core.entity.LogisticLoginHistory;
+import kg.founders.core.entity.LoginHistory;
 import kg.founders.core.services.login.LoginHistoryService;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,7 +29,7 @@ public class LoginHistoryServiceImpl implements LoginHistoryService {
     @Transactional
     public void save(String ip, String login) {
         dao.save(
-                new LogisticLoginHistory(
+                new LoginHistory(
                         null,
                         Timestamp.valueOf(LocalDateTime.now()),
                         login,

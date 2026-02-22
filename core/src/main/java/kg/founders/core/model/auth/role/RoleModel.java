@@ -1,7 +1,7 @@
 package kg.founders.core.model.auth.role;
 
 import kg.founders.core.model.audit.IdBased;
-import kg.founders.core.model.auth.role.permission.LogisticPermissionModel;
+import kg.founders.core.model.auth.role.permission.PermissionModel;
 import kg.founders.core.util.ChainValidator;
 import kg.founders.core.util.Validatable;
 import lombok.*;
@@ -17,12 +17,12 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LogisticRoleModel implements Serializable, Validatable, IdBased {
+public class RoleModel implements Serializable, Validatable, IdBased {
     Long id;
     String name;
     String description;
     boolean active;
-    List<LogisticPermissionModel> permissions;
+    List<PermissionModel> permissions;
 
     @Override
     public String validateMessage() {

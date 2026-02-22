@@ -15,7 +15,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LogisticAuthRoleId implements Serializable {
+public class AuthRoleId implements Serializable {
 
     @Column(name = "AUTH_ID")
     Long authId;

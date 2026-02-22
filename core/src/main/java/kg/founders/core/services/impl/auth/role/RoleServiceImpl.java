@@ -1,11 +1,11 @@
 package kg.founders.core.services.impl.auth.role;
 
 import kg.founders.core.data_access_layer.repo.role.RoleRepo;
-import kg.founders.core.entity.auth.permission.LogisticPermission;
-import kg.founders.core.entity.auth.permission.LogisticRolePermission;
-import kg.founders.core.entity.auth.role.LogisticRole;
+import kg.founders.core.entity.auth.permission.Permission;
+import kg.founders.core.entity.auth.permission.RolePermission;
+import kg.founders.core.entity.auth.role.Role;
 import kg.founders.core.exceptions.ValidationException;
-import kg.founders.core.model.auth.role.LogisticRoleModel;
+import kg.founders.core.model.auth.role.RoleModel;
 import kg.founders.core.services.auth.role.RoleService;
 import kg.founders.core.services.auth.role.permission.RolePermissionService;
 import lombok.AccessLevel;
@@ -28,43 +28,43 @@ public class RoleServiceImpl implements RoleService {
     RolePermissionService rolePermissionService;
 
     @Override
-    public List<LogisticRoleModel> listAllAsModel() {
-        return repo.findByRdtIsNull().stream().map(LogisticRole::toModel).collect(Collectors.toList());
+    public List<RoleModel> listAllAsModel() {
+        return repo.findByRdtIsNull().stream().map(Role::toModel).collect(Collectors.toList());
     }
 
     @Override
-    public Optional<LogisticRole> findById(Long roleId) {
+    public Optional<Role> findById(Long roleId) {
         return repo.findById(roleId);
     }
 
     @Override
     @Transactional
-    public void save(LogisticRoleModel model) {
+    public void save(RoleModel model) {
         model.validate();
 
-        LogisticRole logisticRole;
+        Role role;
 
         if (model.getId() == null) {
-            logisticRole = new LogisticRole();
+            role = new Role();
         } else {
-            logisticRole = repo.getByIdAndRdtIsNull(model.getId())
+            role = repo.getByIdAndRdtIsNull(model.getId())
                     .orElseThrow(() -> new ValidationException(
                             "Запись с id = " + model.getId() + " не найдена"));
 
-            rolePermissionService.deleteAll(logisticRole.getLogisticRolePermissions());
-            logisticRole.setLogisticRolePermissions(null);
+            rolePermissionService.deleteAll(role.getRolePermissions());
+            role.setRolePermissions(null);
         }
 
-        logisticRole.setName(model.getName());
-        logisticRole.setDescription(model.getDescription());
+        role.setName(model.getName());
+        role.setDescription(model.getDescription());
 
-        repo.save(logisticRole);
+        repo.save(role);
 
         rolePermissionService.saveAll(
                 model.getPermissions().stream()
-                        .map(pm -> new LogisticRolePermission(
-                                logisticRole,
-                                new LogisticPermission(pm.getId()),
+                        .map(pm -> new RolePermission(
+                                role,
+                                new Permission(pm.getId()),
                                 pm.getAccess()
                         ))
                         .collect(Collectors.toList()));
@@ -75,7 +75,7 @@ public class RoleServiceImpl implements RoleService {
         repo.getByIdAndRdtIsNull(roleId)
                 .ifPresent(role -> {
                     role.markDeleted();
-                    role.setLogisticRolePermissions(null);
+                    role.setRolePermissions(null);
                     repo.save(role);
                 });
     }

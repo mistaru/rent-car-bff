@@ -1,6 +1,6 @@
 package kg.founders.core.entity.auth.permission;
 
-import kg.founders.core.entity.auth.role.LogisticRole;
+import kg.founders.core.entity.auth.role.Role;
 import kg.founders.core.enums.permission.AccessType;
 import kg.founders.core.util.SqlTable;
 import kg.founders.core.settings.security.permission.AccessPermission;
@@ -16,32 +16,32 @@ import javax.persistence.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = LogisticRolePermission.TABLE_NAME)
+@Table(name = RolePermission.TABLE_NAME)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EntityListeners(AuditingEntityListener.class)
-public class LogisticRolePermission implements AccessPermission {
+public class RolePermission implements AccessPermission {
 
     @SqlTable
-    public static final String TABLE_NAME = "LOGISTIC_ROLE_PERMISSIONS";
+    public static final String TABLE_NAME = "ROLE_PERMISSIONS";
 
     @EmbeddedId
     RolePermissionId id;
 
     @ManyToOne
     @MapsId("roleId")
-    LogisticRole logisticRole;
+    Role role;
 
     @ManyToOne
     @MapsId("permissionId")
-    LogisticPermission logisticPermission;
+    Permission permission;
 
     @Column(nullable = false)
     int permissionAccess;
 
-    public LogisticRolePermission(LogisticRole logisticRole, LogisticPermission logisticPermission, int permissionAccess) {
+    public RolePermission(Role role, Permission permission, int permissionAccess) {
         this.id = new RolePermissionId();
-        this.logisticRole = logisticRole;
-        this.logisticPermission = logisticPermission;
+        this.role = role;
+        this.permission = permission;
         this.permissionAccess = permissionAccess;
     }
 
@@ -50,7 +50,7 @@ public class LogisticRolePermission implements AccessPermission {
     }
 
     public GrantHolder toGrantHolder() {
-        return new GrantHolder(logisticPermission.getName(), getPermissionAccess());
+        return new GrantHolder(permission.getName(), getPermissionAccess());
     }
 
     @Override

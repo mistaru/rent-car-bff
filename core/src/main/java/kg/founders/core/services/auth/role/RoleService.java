@@ -1,17 +1,17 @@
 package kg.founders.core.services.auth.role;
 
-import kg.founders.core.entity.auth.role.LogisticRole;
-import kg.founders.core.model.auth.role.LogisticRoleModel;
+import kg.founders.core.entity.auth.role.Role;
+import kg.founders.core.model.auth.role.RoleModel;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface RoleService {
-    List<LogisticRoleModel> listAllAsModel();
+    List<RoleModel> listAllAsModel();
 
-    Optional<LogisticRole> findById(Long id);
+    Optional<Role> findById(Long id);
 
-    void save(LogisticRoleModel model);
+    void save(RoleModel model);
 
     void delete(Long roleId);
 

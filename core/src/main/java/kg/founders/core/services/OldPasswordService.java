@@ -1,12 +1,12 @@
 package kg.founders.core.services;
 
 
-import kg.founders.core.entity.LogisticOldPassword;
+import kg.founders.core.entity.OldPassword;
 
 import java.util.List;
 
 public interface OldPasswordService {
-    LogisticOldPassword save(LogisticOldPassword logisticOldPassword);
+    OldPassword save(OldPassword oldPassword);
 
-    List<LogisticOldPassword> getLast5RowsByAuthId(Long authId);
+    List<OldPassword> getLast5RowsByAuthId(Long authId);
 }

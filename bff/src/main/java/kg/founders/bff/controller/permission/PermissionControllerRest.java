@@ -1,7 +1,7 @@
 package kg.founders.bff.controller.permission;
 
 import kg.founders.core.enums.permission.PermissionType;
-import kg.founders.core.model.auth.role.permission.LogisticPermissionModel;
+import kg.founders.core.model.auth.role.permission.PermissionModel;
 import kg.founders.core.services.auth.role.permission.PermissionService;
 import kg.founders.core.settings.security.permission.annotation.HasPermission;
 import kg.founders.core.settings.security.permission.annotation.ManualPermissionControl;
@@ -29,7 +29,7 @@ public class PermissionControllerRest {
 
     @GetMapping
     @ManualPermissionControl
-    public List<LogisticPermissionModel> list() {
+    public List<PermissionModel> list() {
         return permissionsService.listAllAsModel();
     }
 }
