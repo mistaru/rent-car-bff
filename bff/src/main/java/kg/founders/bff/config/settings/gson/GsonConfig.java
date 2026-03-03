@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import springfox.documentation.spring.web.json.Json;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -27,7 +28,9 @@ public class GsonConfig {
         return new GsonBuilder()
                 .setDateFormat(DateFormatUtil.DATE_TIME_FORMAT)
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
                 .registerTypeAdapter(byte[].class, new ByteArrayDeserializer())
+                .registerTypeHierarchyAdapter(org.springframework.data.domain.Page.class, new PageSerializer())
                 .registerTypeAdapterFactory(new HibernateProxyAdapterFactory())
                 .registerTypeAdapter(Json.class, (JsonSerializer<Json>) (src, typeOfSrc, context) -> new JsonParser().parse(src.value()))
                 .registerTypeAdapterFactory(gsonAdapterFactory)
