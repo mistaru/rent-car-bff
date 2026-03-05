@@ -1,7 +1,7 @@
 package kg.founders.core.services.rental;
 
 import kg.founders.core.converter.RentalMapper;
-import kg.founders.core.entity.*;
+import kg.founders.core.entity.rental.*;
 import kg.founders.core.enums.*;
 import kg.founders.core.exceptions.*;
 import kg.founders.core.model.rental.*;
@@ -68,14 +68,18 @@ public class BookingService {
         Location dropoffLocation = locationRepository.findById(request.getDropoffLocationId())
                 .orElseThrow(() -> new NotFoundException("Dropoff location not found with id: " + request.getDropoffLocationId()));
 
-        // 4. Calculate days and pricing
+        // 4. Calculate days and pricing (dynamic pricing via PricingTemplate)
         int days = (int) ChronoUnit.DAYS.between(request.getPickupDate(), request.getDropoffDate());
         String currency = request.getCurrency() != null ? request.getCurrency() : "USD";
 
-        PriceBreakdown price = pricingService.calculate(
-                vehicle.getPricePerDay(), days, request.getAddOns(), currency);
+        PriceBreakdown price = pricingService.calculateForVehicle(
+                vehicle.getId(), days, request.getAddOns(), currency);
 
-        // 5. Determine booking status based on payment method
+        // 5. Service block: +1 day before and after for maintenance
+        LocalDate serviceBlockStart = request.getPickupDate().minusDays(1);
+        LocalDate serviceBlockEnd = request.getDropoffDate().plusDays(1);
+
+        // 6. Determine booking status based on payment method
         BookingStatus bookingStatus;
         PaymentStatus paymentStatus;
 
@@ -87,7 +91,7 @@ public class BookingService {
             paymentStatus = PaymentStatus.UNPAID;
         }
 
-        // 6. Build booking
+        // 7. Build booking with fixed pricing
         Booking booking = Booking.builder()
                 .vehicle(vehicle)
                 .customer(customer)
@@ -96,17 +100,23 @@ public class BookingService {
                 .pickupDate(request.getPickupDate())
                 .dropoffDate(request.getDropoffDate())
                 .days(days)
+                .pricePerDay(price.getPricePerDay())
+                .priceTierDescription(price.getTierName())
                 .baseAmount(price.getBaseAmount())
                 .addOnsAmount(price.getAddOnsAmount())
                 .serviceFee(price.getServiceFee())
                 .totalAmount(price.getTotalAmount())
+                .prepaymentAmount(price.getPrepaymentAmount())
+                .prepaymentPaid(false)
+                .serviceBlockStart(serviceBlockStart)
+                .serviceBlockEnd(serviceBlockEnd)
                 .currency(currency)
                 .status(bookingStatus)
                 .paymentStatus(paymentStatus)
                 .addOns(new ArrayList<>())
                 .build();
 
-        // 7. Add add-ons
+        // 8. Add add-ons
         if (request.getAddOns() != null) {
             for (AddOnType addOnType : request.getAddOns()) {
                 BookingAddOn addOn = BookingAddOn.builder()
@@ -118,15 +128,16 @@ public class BookingService {
             }
         }
 
-        // 8. Set vehicle to RESERVED
+        // 9. Set vehicle to RESERVED
         vehicle.setStatus(VehicleStatus.RESERVED);
         vehicleRepository.save(vehicle);
 
-        // 9. Save booking
+        // 10. Save booking
         booking = bookingRepository.save(booking);
-        log.info("Booking created with id: {}, status: {}", booking.getId(), bookingStatus);
+        log.info("Booking created with id: {}, status: {}, prepayment: {}",
+                booking.getId(), bookingStatus, price.getPrepaymentAmount());
 
-        // 10. Publish event
+        // 11. Publish event
         eventPublisher.publishEvent(
                 new BookingCreatedEvent(this, booking.getId(), vehicle.getId(), customer.getId()));
 

@@ -1,6 +1,6 @@
 package kg.founders.core.services.rental;
 
-import kg.founders.core.entity.Vehicle;
+import kg.founders.core.entity.rental.Vehicle;
 import kg.founders.core.enums.BookingStatus;
 import kg.founders.core.enums.VehicleStatus;
 import kg.founders.core.exceptions.NotFoundException;
@@ -32,15 +32,20 @@ public class AvailabilityService {
             return false;
         }
 
+        // Учитываем сервисный день: блокируем 1 день до начала и 1 день после окончания
+        LocalDate blockStart = pickupDate.minusDays(1);
+        LocalDate blockEnd = dropoffDate.plusDays(1);
+
         boolean hasOverlap = bookingRepository.existsOverlappingBooking(
                 vehicleId,
-                pickupDate,
-                dropoffDate,
+                blockStart,
+                blockEnd,
                 Arrays.asList(BookingStatus.CANCELLED)
         );
 
         if (hasOverlap) {
-            log.info("Vehicle {} has overlapping booking for dates {} - {}", vehicleId, pickupDate, dropoffDate);
+            log.info("Vehicle {} has overlapping booking (including service days) for dates {} - {}",
+                    vehicleId, pickupDate, dropoffDate);
             return false;
         }
 

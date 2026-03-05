@@ -1,4 +1,4 @@
-package kg.founders.core.entity;
+package kg.founders.core.entity.rental;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

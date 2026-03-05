@@ -1,4 +1,4 @@
-package kg.founders.core.entity;
+package kg.founders.core.entity.rental;
 
 import kg.founders.core.enums.PaymentMethod;
 import kg.founders.core.enums.PaymentTransactionStatus;

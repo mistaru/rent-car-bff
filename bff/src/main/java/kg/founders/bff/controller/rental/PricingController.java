@@ -18,6 +18,23 @@ public class PricingController {
 
     private final PricingService pricingService;
 
+    /**
+     * Расчёт стоимости по vehicleId (динамическое ценообразование через PricingTemplate).
+     * Фронт должен использовать этот endpoint.
+     */
+    @ManualPermissionControl
+    @GetMapping("/calculate/vehicle/{vehicleId}")
+    public ResponseEntity<PriceBreakdown> calculateForVehicle(
+            @PathVariable Long vehicleId,
+            @RequestParam int days,
+            @RequestParam(required = false) List<AddOnType> addOns,
+            @RequestParam(defaultValue = "USD") String currency) {
+        return ResponseEntity.ok(pricingService.calculateForVehicle(vehicleId, days, addOns, currency));
+    }
+
+    /**
+     * Старый endpoint — расчёт по pricePerDay напрямую (обратная совместимость).
+     */
     @ManualPermissionControl
     @GetMapping("/calculate")
     public ResponseEntity<PriceBreakdown> calculatePrice(

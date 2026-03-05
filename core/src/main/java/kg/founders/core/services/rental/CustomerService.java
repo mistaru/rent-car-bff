@@ -1,8 +1,7 @@
 package kg.founders.core.services.rental;
 
 import kg.founders.core.converter.RentalMapper;
-import kg.founders.core.entity.Customer;
-import kg.founders.core.exceptions.BadRequestException;
+import kg.founders.core.entity.rental.Customer;
 import kg.founders.core.exceptions.NotFoundException;
 import kg.founders.core.model.rental.CreateCustomerRequest;
 import kg.founders.core.model.rental.CustomerDto;
@@ -22,8 +21,12 @@ public class CustomerService {
 
     @Transactional
     public CustomerDto createCustomer(CreateCustomerRequest request) {
-        if (customerRepository.existsByEmail(request.getEmail())) {
-            throw new BadRequestException("Customer with email " + request.getEmail() + " already exists");
+        // Если клиент с таким email уже существует — вернуть его
+        var existing = customerRepository.findByEmail(request.getEmail());
+        if (existing.isPresent()) {
+            log.info("Customer with email {} already exists, returning existing id: {}",
+                    request.getEmail(), existing.get().getId());
+            return rentalMapper.toCustomerDto(existing.get());
         }
         Customer customer = rentalMapper.toCustomerEntity(request);
         customer = customerRepository.save(customer);

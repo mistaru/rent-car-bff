@@ -1,9 +1,9 @@
 package kg.founders.core.services.rental;
 
 import kg.founders.core.converter.RentalMapper;
-import kg.founders.core.entity.Booking;
-import kg.founders.core.entity.Payment;
-import kg.founders.core.entity.Vehicle;
+import kg.founders.core.entity.rental.Booking;
+import kg.founders.core.entity.rental.Payment;
+import kg.founders.core.entity.rental.Vehicle;
 import kg.founders.core.enums.*;
 import kg.founders.core.exceptions.NotFoundException;
 import kg.founders.core.exceptions.PaymentFailedException;

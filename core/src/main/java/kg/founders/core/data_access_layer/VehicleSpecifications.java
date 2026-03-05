@@ -1,7 +1,7 @@
 package kg.founders.core.data_access_layer;
 
-import kg.founders.core.entity.Booking;
-import kg.founders.core.entity.Vehicle;
+import kg.founders.core.entity.rental.Booking;
+import kg.founders.core.entity.rental.Vehicle;
 import kg.founders.core.enums.BookingStatus;
 import kg.founders.core.enums.VehicleStatus;
 import kg.founders.core.model.rental.VehicleSearchRequest;

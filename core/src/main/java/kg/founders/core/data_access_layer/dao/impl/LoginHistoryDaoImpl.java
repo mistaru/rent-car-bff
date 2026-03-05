@@ -17,7 +17,7 @@ public class LoginHistoryDaoImpl implements LoginHistoryDao {
     @Override
     public void save(LoginHistory loginHistory) {
         jdbc.update("insert into " + LoginHistory.TABLE_NAME + " (id, cdt, ip, login)" +
-                        " values (NEXTVAL('logistic_login_history_seq'), ?, ?, ?);"
+                        " values (NEXTVAL('" + LoginHistory.SEQ_NAME + "'), ?, ?, ?);"
                 , loginHistory.getCdt(), loginHistory.getIp(), loginHistory.getLogin());
     }
 

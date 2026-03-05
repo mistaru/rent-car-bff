@@ -1,6 +1,6 @@
 package kg.founders.core.repo;
 
-import kg.founders.core.entity.Booking;
+import kg.founders.core.entity.rental.Booking;
 import kg.founders.core.enums.BookingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

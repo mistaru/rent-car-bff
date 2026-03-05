@@ -1,4 +1,4 @@
-package kg.founders.core.entity;
+package kg.founders.core.entity.rental;
 
 import kg.founders.core.enums.VehicleStatus;
 import lombok.AllArgsConstructor;
@@ -52,6 +52,14 @@ public class Vehicle {
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal pricePerDay;
+
+    /** Кэшированная минимальная цена из тарифного шаблона (для каталога — «от X $») */
+    @Column(precision = 10, scale = 2)
+    private BigDecimal minPricePerDay;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pricing_template_id")
+    private PricingTemplate pricingTemplate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

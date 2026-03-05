@@ -1,7 +1,7 @@
 package kg.founders.core.services.rental;
 
 import kg.founders.core.converter.RentalMapper;
-import kg.founders.core.entity.Location;
+import kg.founders.core.entity.rental.Location;
 import kg.founders.core.exceptions.NotFoundException;
 import kg.founders.core.model.rental.LocationDto;
 import kg.founders.core.repo.LocationRepository;

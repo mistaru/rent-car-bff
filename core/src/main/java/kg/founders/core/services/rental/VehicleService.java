@@ -2,7 +2,7 @@ package kg.founders.core.services.rental;
 
 import kg.founders.core.converter.RentalMapper;
 import kg.founders.core.data_access_layer.VehicleSpecifications;
-import kg.founders.core.entity.Vehicle;
+import kg.founders.core.entity.rental.Vehicle;
 import kg.founders.core.exceptions.NotFoundException;
 import kg.founders.core.model.rental.VehicleDto;
 import kg.founders.core.model.rental.VehicleSearchRequest;

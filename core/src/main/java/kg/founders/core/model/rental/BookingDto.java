@@ -21,10 +21,14 @@ public class BookingDto {
     private final LocalDate pickupDate;
     private final LocalDate dropoffDate;
     private final Integer days;
+    private final BigDecimal pricePerDay;
+    private final String priceTierDescription;
     private final BigDecimal baseAmount;
     private final BigDecimal addOnsAmount;
     private final BigDecimal serviceFee;
     private final BigDecimal totalAmount;
+    private final BigDecimal prepaymentAmount;
+    private final Boolean prepaymentPaid;
     private final String currency;
     private final String status;
     private final String paymentStatus;

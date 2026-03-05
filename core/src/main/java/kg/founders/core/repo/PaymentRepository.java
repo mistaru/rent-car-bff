@@ -1,6 +1,6 @@
 package kg.founders.core.repo;
 
-import kg.founders.core.entity.Payment;
+import kg.founders.core.entity.rental.Payment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

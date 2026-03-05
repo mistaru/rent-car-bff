@@ -1,4 +1,4 @@
-package kg.founders.core.entity;
+package kg.founders.core.entity.rental;
 
 import kg.founders.core.enums.BookingStatus;
 import kg.founders.core.enums.PaymentStatus;
@@ -54,6 +54,14 @@ public class Booking {
     @Column(nullable = false)
     private Integer days;
 
+    /** Зафиксированная цена за день на момент подтверждения бронирования */
+    @Column(precision = 10, scale = 2)
+    private BigDecimal pricePerDay;
+
+    /** Описание выбранного тарифного диапазона, например «Тариф 8–14 дней» */
+    @Column(length = 100)
+    private String priceTierDescription;
+
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal baseAmount;
 
@@ -65,6 +73,23 @@ public class Booking {
 
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal totalAmount;
+
+    /** Сумма предоплаты (15% от totalAmount) */
+    @Column(precision = 12, scale = 2)
+    private BigDecimal prepaymentAmount;
+
+    /** Оплачена ли предоплата */
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean prepaymentPaid = false;
+
+    /** Сервисный день блокировки ДО начала аренды */
+    @Column(name = "service_block_start")
+    private LocalDate serviceBlockStart;
+
+    /** Сервисный день блокировки ПОСЛЕ окончания аренды */
+    @Column(name = "service_block_end")
+    private LocalDate serviceBlockEnd;
 
     @Column(nullable = false, length = 3)
     @Builder.Default
