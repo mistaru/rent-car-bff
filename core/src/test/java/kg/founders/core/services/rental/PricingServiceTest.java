@@ -31,14 +31,14 @@ class PricingServiceTest {
 //    void shouldCalculatePriceWithAddOns() {
 //        PriceBreakdown result = pricingService.calculate(
 //                new BigDecimal("100.00"), 2,
-//                Arrays.asList(AddOnType.GPS, AddOnType.CHILD_SEAT), "EUR");
+//                Arrays.asList(AddOnType.ROOF_TENT, AddOnType.SLEEPING_BAGS), "EUR");
 //
-//        // base: 200, GPS: 2*5=10, CHILD_SEAT: 2*7=14, addOns=24
-//        // subtotal = 224, serviceFee = 22.40, total = 246.40
+//        // base: 200, ROOF_TENT: 2*15=30, SLEEPING_BAGS: 2*5=10, addOns=40
+//        // subtotal = 240, serviceFee = 24.00, total = 264.00
 //        assertThat(result.getBaseAmount()).isEqualByComparingTo("200.00");
-//        assertThat(result.getAddOnsAmount()).isEqualByComparingTo("24.00");
-//        assertThat(result.getServiceFee()).isEqualByComparingTo("22.40");
-//        assertThat(result.getTotalAmount()).isEqualByComparingTo("246.40");
+//        assertThat(result.getAddOnsAmount()).isEqualByComparingTo("40.00");
+//        assertThat(result.getServiceFee()).isEqualByComparingTo("24.00");
+//        assertThat(result.getTotalAmount()).isEqualByComparingTo("264.00");
 //        assertThat(result.getAddOnItems()).hasSize(2);
 //        assertThat(result.getCurrency()).isEqualTo("EUR");
 //    }

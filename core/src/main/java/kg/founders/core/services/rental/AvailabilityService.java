@@ -5,6 +5,7 @@ import kg.founders.core.enums.BookingStatus;
 import kg.founders.core.enums.VehicleStatus;
 import kg.founders.core.exceptions.NotFoundException;
 import kg.founders.core.repo.BookingRepository;
+import kg.founders.core.repo.VehicleBlockedPeriodRepository;
 import kg.founders.core.repo.VehicleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class AvailabilityService {
 
     private final VehicleRepository vehicleRepository;
     private final BookingRepository bookingRepository;
+    private final VehicleBlockedPeriodRepository blockedPeriodRepository;
 
     @Transactional(readOnly = true)
     public boolean isVehicleAvailable(Long vehicleId, LocalDate pickupDate, LocalDate dropoffDate) {
@@ -45,6 +47,16 @@ public class AvailabilityService {
 
         if (hasOverlap) {
             log.info("Vehicle {} has overlapping booking (including service days) for dates {} - {}",
+                    vehicleId, pickupDate, dropoffDate);
+            return false;
+        }
+
+        // Проверяем ручные блокировки (техобслуживание, ремонт и т.д.)
+        boolean hasBlockedPeriod = blockedPeriodRepository.existsOverlappingBlock(
+                vehicleId, pickupDate, dropoffDate);
+
+        if (hasBlockedPeriod) {
+            log.info("Vehicle {} has a manual blocked period for dates {} - {}",
                     vehicleId, pickupDate, dropoffDate);
             return false;
         }

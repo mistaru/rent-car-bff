@@ -15,7 +15,7 @@ public class RentalMapper {
                 .id(vehicle.getId())
                 .brand(vehicle.getBrand())
                 .model(vehicle.getModel())
-                .year(vehicle.getYear())
+                .licensePlate(vehicle.getLicensePlate())
                 .bodyType(vehicle.getBodyType())
                 .drivetrain(vehicle.getDrivetrain())
                 .fuelType(vehicle.getFuelType())
@@ -25,6 +25,7 @@ public class RentalMapper {
                 .image(vehicle.getImage())
                 .status(vehicle.getStatus().name().toLowerCase())
                 .carClass(vehicle.getCarClass())
+                .locationId(vehicle.getLocation() != null ? vehicle.getLocation().getId() : null)
                 .pricingTemplateName(vehicle.getPricingTemplate() != null
                         ? vehicle.getPricingTemplate().getName() : null)
                 .pricingTemplateId(vehicle.getPricingTemplate() != null
@@ -49,6 +50,7 @@ public class RentalMapper {
                 .fullName(customer.getFullName())
                 .email(customer.getEmail())
                 .phone(customer.getPhone())
+                .additionalInfo(customer.getAdditionalInfo())
                 .build();
     }
 
@@ -101,6 +103,7 @@ public class RentalMapper {
                 .fullName(request.getFullName())
                 .email(request.getEmail())
                 .phone(request.getPhone())
+                .additionalInfo(request.getAdditionalInfo())
                 .build();
     }
 

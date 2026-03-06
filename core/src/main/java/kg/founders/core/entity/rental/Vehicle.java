@@ -32,7 +32,6 @@ public class Vehicle {
     @Column(nullable = false)
     private String model;
 
-    private Integer year;
 
     @Column(nullable = false)
     private String licensePlate;

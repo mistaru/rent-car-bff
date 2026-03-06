@@ -16,9 +16,9 @@
 	<groupId>kg.founders</groupId>
 	<artifactId>rent-car-bff</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Simple Logistics CRM BFF</name>
+	<name>Rental Car CRM BFF</name>
 	<packaging>pom</packaging>
-	<description>A backend for the Simple Logistics CRM</description>
+	<description>A backend for the Rental Car CRM</description>
 
     <properties>
 		<java.version>17</java.version>

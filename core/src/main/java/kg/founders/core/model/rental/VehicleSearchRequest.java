@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Future;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 
 @Getter
 @NoArgsConstructor
@@ -21,15 +22,15 @@ public class VehicleSearchRequest {
     private String fuelType;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
-    private Integer year;
-    private Integer yearFrom;
-    private Integer yearTo;
 
     @Future(message = "Pickup date must be in the future")
     private LocalDate pickupDate;
 
     @Future(message = "Dropoff date must be in the future")
     private LocalDate dropoffDate;
+
+    /** Dynamic attribute filters: code -> value, e.g. {"BODY_TYPE": "SUV", "SEATS": "5"} */
+    private Map<String, String> attributeFilters;
 
     private int page = 0;
     private int size = 20;

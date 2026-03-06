@@ -32,6 +32,7 @@ public class BookingService {
     private final PricingService pricingService;
     private final RentalMapper rentalMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final BookingHistoryService bookingHistoryService;
 
     @Transactional
     public BookingDto createBooking(CreateBookingRequest request) {
@@ -141,7 +142,46 @@ public class BookingService {
         eventPublisher.publishEvent(
                 new BookingCreatedEvent(this, booking.getId(), vehicle.getId(), customer.getId()));
 
+        // 12. Audit log
+        bookingHistoryService.logCreated(booking, "system");
+
         return rentalMapper.toBookingDto(booking);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BookingDto> getAllBookings() {
+        return bookingRepository.findAllWithDetails().stream()
+                .map(rentalMapper::toBookingDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<BookingCalendarItem> getBookingsForCalendar() {
+        return bookingRepository.findAllWithDetails().stream()
+                .map(b -> {
+                    String color;
+                    switch (b.getStatus()) {
+                        case CONFIRMED: color = "#4CAF50"; break;
+                        case PENDING_PAYMENT: color = "#FF9800"; break;
+                        case CANCELLED: color = "#F44336"; break;
+                        default: color = "#9E9E9E"; break;
+                    }
+                    return BookingCalendarItem.builder()
+                            .id(b.getId())
+                            .vehicleName(b.getVehicle().getBrand() + " " + b.getVehicle().getModel())
+                            .vehicleImage(b.getVehicle().getImage())
+                            .carClass(b.getVehicle().getCarClass())
+                            .customerName(b.getCustomer().getFullName())
+                            .pickupDate(b.getPickupDate().toString())
+                            .dropoffDate(b.getDropoffDate().toString())
+                            .days(b.getDays())
+                            .status(b.getStatus().name())
+                            .paymentStatus(b.getPaymentStatus().name())
+                            .totalAmount(b.getTotalAmount())
+                            .color(color)
+                            .build();
+                })
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -175,6 +215,140 @@ public class BookingService {
 
         booking = bookingRepository.save(booking);
         log.info("Booking {} cancelled", bookingId);
+
+        bookingHistoryService.logCancelled(booking, "system");
+
+        return rentalMapper.toBookingDto(booking);
+    }
+
+    @Transactional
+    public BookingDto updateBooking(Long bookingId, UpdateBookingRequest request) {
+        Booking booking = bookingRepository.findByIdWithDetails(bookingId)
+                .orElseThrow(() -> new NotFoundException("Booking not found with id: " + bookingId));
+
+        if (booking.getStatus() == BookingStatus.CANCELLED) {
+            throw new BadRequestException("Cannot update cancelled booking");
+        }
+
+        // Обновление дат
+        boolean datesChanged = false;
+        LocalDate newPickup = request.getPickupDate() != null ? request.getPickupDate() : booking.getPickupDate();
+        LocalDate newDropoff = request.getDropoffDate() != null ? request.getDropoffDate() : booking.getDropoffDate();
+
+        if (!newPickup.equals(booking.getPickupDate()) || !newDropoff.equals(booking.getDropoffDate())) {
+            validateDates(newPickup, newDropoff);
+            datesChanged = true;
+
+            String oldDates = booking.getPickupDate() + " → " + booking.getDropoffDate();
+            String newDates = newPickup + " → " + newDropoff;
+
+            booking.setPickupDate(newPickup);
+            booking.setDropoffDate(newDropoff);
+            int days = (int) ChronoUnit.DAYS.between(newPickup, newDropoff);
+            booking.setDays(days);
+            booking.setServiceBlockStart(newPickup.minusDays(1));
+            booking.setServiceBlockEnd(newDropoff.plusDays(1));
+
+            // Пересчёт стоимости
+            PriceBreakdown price = pricingService.calculateForVehicle(
+                    booking.getVehicle().getId(), days,
+                    booking.getAddOns() != null
+                            ? booking.getAddOns().stream().map(BookingAddOn::getAddOnType).collect(java.util.stream.Collectors.toList())
+                            : null,
+                    booking.getCurrency());
+            booking.setPricePerDay(price.getPricePerDay());
+            booking.setPriceTierDescription(price.getTierName());
+            booking.setBaseAmount(price.getBaseAmount());
+            booking.setAddOnsAmount(price.getAddOnsAmount());
+            booking.setServiceFee(price.getServiceFee());
+            booking.setTotalAmount(price.getTotalAmount());
+            booking.setPrepaymentAmount(price.getPrepaymentAmount());
+
+            // Audit: dates changed
+            bookingHistoryService.logFieldChange(booking, "DATES_CHANGED", "dates",
+                    oldDates, newDates, "system");
+        }
+
+        // Обновление локаций
+        if (request.getPickupLocationId() != null) {
+            String oldLoc = booking.getPickupLocation() != null ? booking.getPickupLocation().getName() : null;
+            Location pickupLoc = locationRepository.findById(request.getPickupLocationId())
+                    .orElseThrow(() -> new NotFoundException("Pickup location not found"));
+            booking.setPickupLocation(pickupLoc);
+            if (oldLoc == null || !oldLoc.equals(pickupLoc.getName())) {
+                bookingHistoryService.logFieldChange(booking, "UPDATED", "pickupLocation",
+                        oldLoc, pickupLoc.getName(), "system");
+            }
+        }
+        if (request.getDropoffLocationId() != null) {
+            String oldLoc = booking.getDropoffLocation() != null ? booking.getDropoffLocation().getName() : null;
+            Location dropoffLoc = locationRepository.findById(request.getDropoffLocationId())
+                    .orElseThrow(() -> new NotFoundException("Dropoff location not found"));
+            booking.setDropoffLocation(dropoffLoc);
+            if (oldLoc == null || !oldLoc.equals(dropoffLoc.getName())) {
+                bookingHistoryService.logFieldChange(booking, "UPDATED", "dropoffLocation",
+                        oldLoc, dropoffLoc.getName(), "system");
+            }
+        }
+
+        // Обновление статуса
+        if (request.getStatus() != null) {
+            try {
+                BookingStatus oldStatus = booking.getStatus();
+                BookingStatus newStatus = BookingStatus.valueOf(request.getStatus());
+                if (oldStatus != newStatus) {
+                    booking.setStatus(newStatus);
+                    // Если подтверждаем — авто BOOKED, если отменяем — AVAILABLE
+                    if (newStatus == BookingStatus.CONFIRMED) {
+                        booking.getVehicle().setStatus(VehicleStatus.BOOKED);
+                    } else if (newStatus == BookingStatus.CANCELLED) {
+                        booking.getVehicle().setStatus(VehicleStatus.AVAILABLE);
+                    }
+                    bookingHistoryService.logFieldChange(booking, "STATUS_CHANGED", "status",
+                            oldStatus.name(), newStatus.name(), "system");
+                }
+            } catch (IllegalArgumentException e) {
+                throw new BadRequestException("Invalid booking status: " + request.getStatus());
+            }
+        }
+
+        // Обновление клиентских данных
+        Customer customer = booking.getCustomer();
+        boolean customerChanged = false;
+        if (request.getCustomerFullName() != null && !request.getCustomerFullName().equals(customer.getFullName())) {
+            String old = customer.getFullName();
+            customer.setFullName(request.getCustomerFullName());
+            bookingHistoryService.logFieldChange(booking, "CUSTOMER_UPDATED", "fullName", old, request.getCustomerFullName(), "system");
+            customerChanged = true;
+        }
+        if (request.getCustomerEmail() != null && !request.getCustomerEmail().equals(customer.getEmail())) {
+            String old = customer.getEmail();
+            customer.setEmail(request.getCustomerEmail());
+            bookingHistoryService.logFieldChange(booking, "CUSTOMER_UPDATED", "email", old, request.getCustomerEmail(), "system");
+            customerChanged = true;
+        }
+        if (request.getCustomerPhone() != null && !request.getCustomerPhone().equals(customer.getPhone())) {
+            String old = customer.getPhone();
+            customer.setPhone(request.getCustomerPhone());
+            bookingHistoryService.logFieldChange(booking, "CUSTOMER_UPDATED", "phone", old, request.getCustomerPhone(), "system");
+            customerChanged = true;
+        }
+        if (request.getCustomerAdditionalInfo() != null && !request.getCustomerAdditionalInfo().equals(customer.getAdditionalInfo())) {
+            customer.setAdditionalInfo(request.getCustomerAdditionalInfo());
+            customerChanged = true;
+        }
+        if (customerChanged) {
+            customerRepository.save(customer);
+        }
+
+        // Записать комментарий менеджера в историю (если есть)
+        if (request.getManagerComment() != null && !request.getManagerComment().isBlank()) {
+            bookingHistoryService.logFieldChangeWithComment(booking, "COMMENT", null,
+                    null, null, request.getManagerComment().trim(), "manager");
+        }
+
+        booking = bookingRepository.save(booking);
+        log.info("Booking {} updated. datesChanged={}", bookingId, datesChanged);
 
         return rentalMapper.toBookingDto(booking);
     }

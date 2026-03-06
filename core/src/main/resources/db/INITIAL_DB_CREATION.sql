@@ -1,21 +1,22 @@
--- ONLY 3 STEPS REQUIRED !!!
--- 1. Create the database (if it doesn't exist)
-CREATE DATABASE crm_bff WITH OWNER = postgres
+-- =============================================
+-- Создание базы данных rent_car
+-- Выполнить от имени суперпользователя postgres
+-- =============================================
+
+-- 1. Создать базу данных
+CREATE DATABASE rent_car WITH OWNER = postgres
          ENCODING = 'UTF8'
          LC_COLLATE = 'en_US.utf8'
          LC_CTYPE = 'en_US.utf8';
 
--- 2. Create the user (if it doesn't exist)
-CREATE ROLE postgres WITH LOGIN PASSWORD 'postgres';
+-- 2. Подключиться к БД
+-- \c rent_car
 
--- 3. Grant privileges on the database to the user
-GRANT ALL PRIVILEGES ON DATABASE crm_bff TO postgres;
-
--- 4. Connect to the crm_bff database using psql
--- \c crm_bff
---
--- -- 5. Create the logistic schema
--- CREATE SCHEMA IF NOT EXISTS logistic AUTHORIZATION postgres;  -- postgres owns the schema
---
--- -- 6. Grant privileges on the schema to the user (Important!)
--- GRANT ALL PRIVILEGES ON SCHEMA logistic TO postgres;
+-- =============================================
+-- ПОРЯДОК ДЕЙСТВИЙ ПОСЛЕ СОЗДАНИЯ БД:
+-- =============================================
+-- 1. Создать БД (этот скрипт)
+-- 2. Запустить приложение (Hibernate ddl-auto:update создаст все таблицы)
+-- 3. Выполнить scripts/001_AUTH_SEED.sql   — пользователи admin/manager
+-- 4. Выполнить scripts/002_RENTAL_SEED.sql — мок-данные для Car Rental
+-- =============================================

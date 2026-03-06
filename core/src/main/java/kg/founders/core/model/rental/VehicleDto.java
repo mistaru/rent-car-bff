@@ -3,27 +3,36 @@ package kg.founders.core.model.rental;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 @Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class VehicleDto {
-    private final Long id;
-    private final String brand;
-    private final String model;
-    private final Integer year;
-    private final String bodyType;
-    private final String drivetrain;
-    private final String fuelType;
-    private final String transmission;
-    private final BigDecimal pricePerDay;
+    private Long id;
+    private String brand;
+    private String model;
+    private String licensePlate;
+    private String bodyType;
+    private String drivetrain;
+    private String fuelType;
+    private String transmission;
+    private BigDecimal pricePerDay;
     /** Минимальная цена из тарифного шаблона (для каталога — «от X $») */
-    private final BigDecimal minPricePerDay;
-    private final String image;
-    private final String status;
-    private final String carClass;
-    private final String pricingTemplateName;
-    private final Long pricingTemplateId;
+    private BigDecimal minPricePerDay;
+    private String image;
+    private String status;
+    private String carClass;
+    private String pricingTemplateName;
+    private Long pricingTemplateId;
+    private Long locationId;
+
+    /** Dynamic vehicle attributes: code -> value, e.g. {"SEATS": "5", "COLOR": "Black"} */
+    private Map<String, String> attributes;
 }

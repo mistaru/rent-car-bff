@@ -27,6 +27,7 @@ public class PaymentService {
     private final BookingRepository bookingRepository;
     private final VehicleRepository vehicleRepository;
     private final RentalMapper rentalMapper;
+    private final BookingHistoryService bookingHistoryService;
 
     @Transactional
     public PaymentDto initiatePayment(Long bookingId) {
@@ -46,6 +47,9 @@ public class PaymentService {
 
         payment = paymentRepository.save(payment);
         log.info("Payment initiated for booking {}, payment id: {}", bookingId, payment.getId());
+
+        bookingHistoryService.logFieldChange(booking, "PAYMENT_INITIATED", "paymentId",
+                null, String.valueOf(payment.getId()), "system");
 
         return rentalMapper.toPaymentDto(payment);
     }
@@ -84,6 +88,9 @@ public class PaymentService {
         vehicleRepository.save(vehicle);
 
         log.info("Payment successful for booking {}, transaction: {}", booking.getId(), transactionId);
+
+        bookingHistoryService.logFieldChange(booking, "PAYMENT_COMPLETED", "status",
+                "PENDING_PAYMENT", "CONFIRMED", "system");
 
         return rentalMapper.toPaymentDto(payment);
     }

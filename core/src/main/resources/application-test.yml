@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/logistic
-    username: postgres
-    password: 1209
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/rent_car}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver

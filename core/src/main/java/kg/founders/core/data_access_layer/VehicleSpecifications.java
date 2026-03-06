@@ -2,6 +2,7 @@ package kg.founders.core.data_access_layer;
 
 import kg.founders.core.entity.rental.Booking;
 import kg.founders.core.entity.rental.Vehicle;
+import kg.founders.core.entity.rental.VehicleAttributeValue;
 import kg.founders.core.enums.BookingStatus;
 import kg.founders.core.enums.VehicleStatus;
 import kg.founders.core.model.rental.VehicleSearchRequest;
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public final class VehicleSpecifications {
 
@@ -62,18 +64,6 @@ public final class VehicleSpecifications {
                 predicates.add(cb.lessThanOrEqualTo(root.<BigDecimal>get("pricePerDay"), request.getMaxPrice()));
             }
 
-            // Filter by exact year
-            if (request.getYear() != null) {
-                predicates.add(cb.equal(root.get("year"), request.getYear()));
-            }
-
-            // Filter by year range
-            if (request.getYearFrom() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("year"), request.getYearFrom()));
-            }
-            if (request.getYearTo() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("year"), request.getYearTo()));
-            }
 
             // Exclude vehicles with overlapping active bookings
             if (request.getPickupDate() != null && request.getDropoffDate() != null) {
@@ -91,6 +81,25 @@ public final class VehicleSpecifications {
                 );
 
                 predicates.add(cb.not(cb.exists(bookingSubquery)));
+            }
+
+            // Filter by dynamic vehicle attributes
+            if (request.getAttributeFilters() != null && !request.getAttributeFilters().isEmpty()) {
+                for (Map.Entry<String, String> entry : request.getAttributeFilters().entrySet()) {
+                    String attrCode = entry.getKey();
+                    String attrValue = entry.getValue();
+                    if (attrValue == null || attrValue.isBlank()) continue;
+
+                    Subquery<Long> attrSubquery = query.subquery(Long.class);
+                    Root<VehicleAttributeValue> attrRoot = attrSubquery.from(VehicleAttributeValue.class);
+                    attrSubquery.select(attrRoot.get("vehicle").get("id"));
+                    attrSubquery.where(
+                            cb.equal(attrRoot.get("vehicle").get("id"), root.get("id")),
+                            cb.equal(attrRoot.get("attribute").get("code"), attrCode),
+                            cb.equal(cb.lower(attrRoot.get("value")), attrValue.toLowerCase())
+                    );
+                    predicates.add(cb.exists(attrSubquery));
+                }
             }
 
             // Fetch join location to avoid N+1

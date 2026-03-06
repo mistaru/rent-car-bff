@@ -14,6 +14,9 @@ import kg.founders.core.settings.security.permission.annotation.ManualPermission
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/vehicles")
@@ -33,16 +36,22 @@ public class VehicleController {
             @RequestParam(required = false) String fuelType,
             @RequestParam(required = false) String minPrice,
             @RequestParam(required = false) String maxPrice,
-            @RequestParam(required = false) String year,
-            @RequestParam(required = false) String yearFrom,
-            @RequestParam(required = false) String yearTo,
             @RequestParam(required = false) String pickupDate,
             @RequestParam(required = false) String dropoffDate,
             @RequestParam(required = false) String page,
-            @RequestParam(required = false) String size) {
+            @RequestParam(required = false) String size,
+            @RequestParam Map<String, String> allParams) {
 
         Integer parsedPage = parseInt(page);
         Integer parsedSize = parseInt(size);
+
+        // Extract dynamic attribute filters (params starting with "attr_")
+        Map<String, String> attrFilters = new HashMap<>();
+        for (Map.Entry<String, String> entry : allParams.entrySet()) {
+            if (entry.getKey().startsWith("attr_") && entry.getValue() != null && !entry.getValue().isBlank()) {
+                attrFilters.put(entry.getKey().substring(5), entry.getValue());
+            }
+        }
 
         VehicleSearchRequest request = VehicleSearchRequest.builder()
                 .locationId(parseLong(locationId))
@@ -52,11 +61,9 @@ public class VehicleController {
                 .fuelType(blankToNull(fuelType))
                 .minPrice(parseDecimal(minPrice))
                 .maxPrice(parseDecimal(maxPrice))
-                .year(parseInt(year))
-                .yearFrom(parseInt(yearFrom))
-                .yearTo(parseInt(yearTo))
                 .pickupDate(parseDate(pickupDate))
                 .dropoffDate(parseDate(dropoffDate))
+                .attributeFilters(attrFilters.isEmpty() ? null : attrFilters)
                 .page(parsedPage != null ? parsedPage : 0)
                 .size(parsedSize != null ? parsedSize : 20)
                 .build();
@@ -105,5 +112,30 @@ public class VehicleController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate pickupDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dropoffDate) {
         return ResponseEntity.ok(availabilityService.isVehicleAvailable(id, pickupDate, dropoffDate));
+    }
+
+    @ManualPermissionControl
+    @GetMapping("/all")
+    public ResponseEntity<List<VehicleDto>> getAllVehicles() {
+        return ResponseEntity.ok(vehicleService.getAllVehicles());
+    }
+
+    @ManualPermissionControl
+    @PostMapping
+    public ResponseEntity<VehicleDto> createVehicle(@RequestBody VehicleDto dto) {
+        return ResponseEntity.ok(vehicleService.createVehicle(dto));
+    }
+
+    @ManualPermissionControl
+    @PutMapping("/{id}")
+    public ResponseEntity<VehicleDto> updateVehicle(@PathVariable Long id, @RequestBody VehicleDto dto) {
+        return ResponseEntity.ok(vehicleService.updateVehicle(id, dto));
+    }
+
+    @ManualPermissionControl
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteVehicle(@PathVariable Long id) {
+        vehicleService.deleteVehicle(id);
+        return ResponseEntity.noContent().build();
     }
 }

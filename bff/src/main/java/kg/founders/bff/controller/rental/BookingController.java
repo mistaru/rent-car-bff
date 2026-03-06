@@ -1,7 +1,11 @@
 package kg.founders.bff.controller.rental;
 
+import kg.founders.core.model.rental.BookingCalendarItem;
 import kg.founders.core.model.rental.BookingDto;
+import kg.founders.core.model.rental.BookingHistoryDto;
 import kg.founders.core.model.rental.CreateBookingRequest;
+import kg.founders.core.model.rental.UpdateBookingRequest;
+import kg.founders.core.services.rental.BookingHistoryService;
 import kg.founders.core.services.rental.BookingService;
 import kg.founders.core.settings.security.permission.annotation.ManualPermissionControl;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +22,19 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final BookingHistoryService bookingHistoryService;
 
     @ManualPermissionControl
     @PostMapping
     public ResponseEntity<BookingDto> createBooking(@Valid @RequestBody CreateBookingRequest request) {
         BookingDto booking = bookingService.createBooking(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(booking);
+    }
+
+    @ManualPermissionControl
+    @GetMapping
+    public ResponseEntity<List<BookingDto>> getAllBookings() {
+        return ResponseEntity.ok(bookingService.getAllBookings());
     }
 
     @ManualPermissionControl
@@ -39,8 +50,27 @@ public class BookingController {
     }
 
     @ManualPermissionControl
+    @PutMapping("/{id}")
+    public ResponseEntity<BookingDto> updateBooking(@PathVariable Long id,
+                                                     @RequestBody UpdateBookingRequest request) {
+        return ResponseEntity.ok(bookingService.updateBooking(id, request));
+    }
+
+    @ManualPermissionControl
     @PostMapping("/{id}/cancel")
     public ResponseEntity<BookingDto> cancelBooking(@PathVariable Long id) {
         return ResponseEntity.ok(bookingService.cancelBooking(id));
+    }
+
+    @ManualPermissionControl
+    @GetMapping("/{id}/history")
+    public ResponseEntity<List<BookingHistoryDto>> getBookingHistory(@PathVariable Long id) {
+        return ResponseEntity.ok(bookingHistoryService.getHistoryByBookingId(id));
+    }
+
+    @ManualPermissionControl
+    @GetMapping("/calendar")
+    public ResponseEntity<List<BookingCalendarItem>> getBookingsCalendar() {
+        return ResponseEntity.ok(bookingService.getBookingsForCalendar());
     }
 }

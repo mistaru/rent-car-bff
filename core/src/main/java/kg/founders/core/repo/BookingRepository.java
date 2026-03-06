@@ -1,6 +1,7 @@
 package kg.founders.core.repo;
 
 import kg.founders.core.entity.rental.Booking;
+import kg.founders.core.enums.AddOnType;
 import kg.founders.core.enums.BookingStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -39,4 +40,20 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "WHERE b.customer.id = :customerId " +
             "ORDER BY b.createdAt DESC")
     List<Booking> findByCustomerIdWithDetails(@Param("customerId") Long customerId);
+
+    @Query("SELECT b FROM Booking b " +
+            "JOIN FETCH b.vehicle " +
+            "JOIN FETCH b.customer " +
+            "JOIN FETCH b.pickupLocation " +
+            "JOIN FETCH b.dropoffLocation " +
+            "ORDER BY b.createdAt DESC")
+    List<Booking> findAllWithDetails();
+
+    /** Count how many active bookings currently use a given add-on (for inventory) */
+    @Query("SELECT COUNT(a) FROM BookingAddOn a " +
+            "WHERE a.addOnType = :addOnType " +
+            "AND a.booking.status NOT IN (kg.founders.core.enums.BookingStatus.CANCELLED) " +
+            "AND a.booking.dropoffDate >= :today")
+    long countActiveAddOnUsage(@Param("addOnType") AddOnType addOnType,
+                                @Param("today") LocalDate today);
 }

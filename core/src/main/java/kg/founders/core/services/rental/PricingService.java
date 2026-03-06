@@ -2,12 +2,14 @@ package kg.founders.core.services.rental;
 
 import kg.founders.core.entity.rental.PriceTier;
 import kg.founders.core.entity.rental.PricingTemplate;
+import kg.founders.core.entity.rental.ServiceOption;
 import kg.founders.core.entity.rental.Vehicle;
 import kg.founders.core.enums.AddOnType;
 import kg.founders.core.exceptions.BadRequestException;
 import kg.founders.core.exceptions.NotFoundException;
 import kg.founders.core.model.rental.PriceBreakdown;
 import kg.founders.core.repo.PricingTemplateRepository;
+import kg.founders.core.repo.ServiceOptionRepository;
 import kg.founders.core.repo.VehicleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,7 @@ public class PricingService {
 
     private final VehicleRepository vehicleRepository;
     private final PricingTemplateRepository pricingTemplateRepository;
+    private final ServiceOptionRepository serviceOptionRepository;
 
     /**
      * Рассчитывает стоимость аренды для конкретного автомобиля,
@@ -54,24 +57,41 @@ public class PricingService {
             pricePerDay = vehicle.getPricePerDay();
         }
 
-        return calculate(pricePerDay, days, addOns, currency != null ? currency : "USD", tierName);
+        // Конвертируем AddOnType enum в коды строк для единой обработки
+        List<String> addOnCodes = null;
+        if (addOns != null) {
+            addOnCodes = new ArrayList<>();
+            for (AddOnType a : addOns) {
+                addOnCodes.add(a.name());
+            }
+        }
+
+        return calculateByCodes(pricePerDay, days, addOnCodes, currency != null ? currency : "USD", tierName);
     }
 
     /**
      * Базовый расчёт — совместимость со старым API (без vehicleId).
-     * Использует переданную pricePerDay напрямую.
      */
     public PriceBreakdown calculate(BigDecimal pricePerDay, int days, List<AddOnType> addOns, String currency) {
-        return calculate(pricePerDay, days, addOns, currency, null);
+        List<String> codes = null;
+        if (addOns != null) {
+            codes = new ArrayList<>();
+            for (AddOnType a : addOns) {
+                codes.add(a.name());
+            }
+        }
+        return calculateByCodes(pricePerDay, days, codes, currency, null);
     }
 
     /**
      * Полный расчёт стоимости с детализацией.
+     * Цена доп. услуг берётся из таблицы service_options по коду.
+     * Если не найдена — fallback на AddOnType enum (обратная совместимость).
      */
-    public PriceBreakdown calculate(BigDecimal pricePerDay, int days, List<AddOnType> addOns,
-                                     String currency, String tierName) {
-        log.debug("Calculating price: pricePerDay={}, days={}, addOns={}, tier={}",
-                pricePerDay, days, addOns, tierName);
+    public PriceBreakdown calculateByCodes(BigDecimal pricePerDay, int days, List<String> addOnCodes,
+                                            String currency, String tierName) {
+        log.debug("Calculating price: pricePerDay={}, days={}, addOnCodes={}, tier={}",
+                pricePerDay, days, addOnCodes, tierName);
 
         if (days < 1) {
             throw new BadRequestException("Rental period must be at least 1 day");
@@ -82,14 +102,34 @@ public class PricingService {
         List<PriceBreakdown.AddOnPriceItem> addOnItems = new ArrayList<>();
         BigDecimal addOnsAmount = BigDecimal.ZERO;
 
-        if (addOns != null) {
-            for (AddOnType addOn : addOns) {
-                BigDecimal addOnTotal = addOn.getPricePerDay()
+        if (addOnCodes != null) {
+            for (String code : addOnCodes) {
+                BigDecimal addOnPricePerDay;
+                String displayName;
+
+                // Сначала ищем в таблице service_options
+                ServiceOption option = serviceOptionRepository.findByCode(code).orElse(null);
+                if (option != null) {
+                    addOnPricePerDay = option.getPricePerDay();
+                    displayName = option.getName();
+                } else {
+                    // Fallback: ищем в enum AddOnType (обратная совместимость)
+                    try {
+                        AddOnType enumVal = AddOnType.valueOf(code);
+                        addOnPricePerDay = enumVal.getPricePerDay();
+                        displayName = code;
+                    } catch (IllegalArgumentException e) {
+                        log.warn("Unknown add-on code: {}, skipping", code);
+                        continue;
+                    }
+                }
+
+                BigDecimal addOnTotal = addOnPricePerDay
                         .multiply(BigDecimal.valueOf(days))
                         .setScale(2, RoundingMode.HALF_UP);
                 addOnItems.add(PriceBreakdown.AddOnPriceItem.builder()
-                        .name(addOn.name())
-                        .pricePerDay(addOn.getPricePerDay())
+                        .name(displayName)
+                        .pricePerDay(addOnPricePerDay)
                         .total(addOnTotal)
                         .build());
                 addOnsAmount = addOnsAmount.add(addOnTotal);

@@ -30,4 +30,7 @@ public class Customer {
     private String email;
 
     private String phone;
+
+    @Column(length = 1024)
+    private String additionalInfo;
 }
