@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -32,6 +33,8 @@ public class VehicleDto {
     private String pricingTemplateName;
     private Long pricingTemplateId;
     private Long locationId;
+
+    private List<VehiclePhotosDto> photos;
 
     /** Dynamic vehicle attributes: code -> value, e.g. {"SEATS": "5", "COLOR": "Black"} */
     private Map<String, String> attributes;

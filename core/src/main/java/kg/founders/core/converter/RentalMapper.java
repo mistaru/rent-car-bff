@@ -140,4 +140,13 @@ public class RentalMapper {
                 .pricePerDay(tier.getPricePerDay())
                 .build();
     }
+
+    public VehiclePhotosDto toVehiclePhotosDto(VehiclePhotos photo) {
+        if (photo == null) return null;
+        return VehiclePhotosDto.builder()
+                .id(photo.getId())
+                .url(photo.getUrl())
+                .sortOrder(photo.getSortOrder())
+                .build();
+    }
 }
