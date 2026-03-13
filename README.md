@@ -1,54 +1,45 @@
-# Spring Boot Application
+# Rent Car Application
 
-## Table of Contents
-- [Introduction](#introduction)
-- [Technology Stack](#technology-stack)
-- [Setup and Installation](#setup-and-installation)
-- [Running the Application](#running-the-application)
-- [API Documentation](#api-documentation)
-- [Contributing](#contributing)
-- [License](#license)
 
-## Introduction
-This is a Spring Boot application that serves as the backend for a frontend application. It utilizes Spring Boot 3.4.1, Java 17, and PostgreSQL for database management.
+### Технологический стек
 
-## Technology Stack
-- **Java**: Version 17
-- **Spring Boot**: Version 3.4.1
-- **PostgreSQL**: Used as the relational database management system
-- **Maven**: For dependency management and build automation
+- **Java 17**, **Spring Boot 2.7.18**
+- **PostgreSQL 15** (docker-compose)
+- **Spring Security** — stateless, JWT-токены (через `TokenAuthFilter`)
+- **Hibernate ddl-auto: update** — схема создаётся автоматически из entity-классов
 
-## Swagger
-PROD:
-http://localhost:8080/swagger-ui/index.html
 
-STAGE:
-http://localhost:8080/swagger-ui/index.html
+## Локальный запуск
 
-## Setup and Installation
-To set up and run the application locally, follow these steps:
-
-1. Clone the repository:
-    ```bash
-    git clone <repository-url>
-    ```
-
-2. Navigate to the project directory:
-    ```bash
-    cd <project-directory>
-    ```
-
-3. Configure the PostgreSQL database:
-    - Ensure PostgreSQL is installed and running.
-    - Create a new database for the application.
-    - Update the `application.properties` or `application.yml` file with your PostgreSQL database credentials.
-
-4. Build the project using Maven:
-    ```bash
-    ./mvnw clean install
-    ```
-
-## Running the Application
-To run the application, use the following command:
+1. Создание БД - выполнить `INITIAL_DB_CREATION.sql` в PostgreSQL (или запустить `docker-compose up` для автоматического создания БД через Docker)
 ```bash
-./mvnw spring-boot:run
+docker-compose up -d
+```
+Поднимается PostgreSQL 15 на localhost:5432:
+
+DB: rent_car
+User: postgres
+Password: postgres
+
+2. Запустить бэкенд
+```bash
+./mvnw clean install -DskipTests
+cd bff
+../mvnw spring-boot:run
+```
+Сервер запустится на **http://localhost:8081**
+
+## ⚙️ Конфигурация
+
+| Файл | Описание |
+|------|----------|
+| `core/src/main/resources/application.yml` | Общие настройки: порт 8081, JPA, Redis-кеш, liquibase off |
+| `core/src/main/resources/application-test.yml` | Профиль `test` (по умолчанию): PostgreSQL на localhost |
+| `core/src/main/resources/application-dev.yml` | Профиль `dev` |
+| `core/src/main/resources/application-prod.yml` | Профиль `prod` |
+
+**Активный профиль:** `test` (по умолчанию, через `ACTIVE_PROFILE` env).
+
+
+3. Выполнить SQL-скрипты `001_AUTH_SEED.sql` и `002_RENTAL_SEED.sql` для заполнения БД начальными данными (пользователи, роли, автомобили и т.д.)
+
