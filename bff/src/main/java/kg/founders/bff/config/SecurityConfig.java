@@ -29,8 +29,6 @@ import java.util.Collections;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static final RequestMatcher PUBLIC_URLS = new OrRequestMatcher(
-            new AntPathRequestMatcher("/public/**"),
-            new AntPathRequestMatcher("/api/public/**"),
             new AntPathRequestMatcher("/v2/api-docs/**"),
             new AntPathRequestMatcher("/swagger-ui.html/**"),
             new AntPathRequestMatcher("/swagger-resources/**"),
@@ -57,7 +55,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(authenticationEntryPoint())
                 .and()
                 .authorizeRequests()
-                .antMatchers("/**").permitAll()
+                .antMatchers("/public/**").permitAll()
+                .antMatchers("/api/public/**").permitAll()
                 .antMatchers("/actuator/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
