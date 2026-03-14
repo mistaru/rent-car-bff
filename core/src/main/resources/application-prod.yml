@@ -27,6 +27,7 @@ spring:
     multipart:
       max-file-size: 15MB
       max-request-size: 15MB
+      enabled: true
 
   file:
     path: ${FILES_PATH_NAME:files}

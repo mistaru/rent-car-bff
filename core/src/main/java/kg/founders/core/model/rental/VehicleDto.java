@@ -34,8 +34,15 @@ public class VehicleDto {
     private Long pricingTemplateId;
     private Long locationId;
 
-    private List<VehiclePhotosDto> photos;
+    private List<VehicleImageDto> images;
 
     /** Dynamic vehicle attributes: code -> value, e.g. {"SEATS": "5", "COLOR": "Black"} */
     private Map<String, String> attributes;
+
+    public List<String> getImages() {
+        if (images == null || images.isEmpty()) return List.of();
+        return images.stream()
+                .map(VehicleImageDto::getUrl)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

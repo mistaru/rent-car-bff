@@ -11,7 +11,7 @@ public class RentalMapper {
 
     public VehicleDto toVehicleDto(Vehicle vehicle) {
         if (vehicle == null) return null;
-        return VehicleDto.builder()
+        VehicleDto dto = VehicleDto.builder()
                 .id(vehicle.getId())
                 .brand(vehicle.getBrand())
                 .model(vehicle.getModel())
@@ -31,6 +31,19 @@ public class RentalMapper {
                 .pricingTemplateId(vehicle.getPricingTemplate() != null
                         ? vehicle.getPricingTemplate().getId() : null)
                 .build();
+
+        if (vehicle.getImages() != null) {
+            dto.setImages(vehicle.getImages().stream()
+                    .map(img -> VehicleImageDto.builder()
+                            .id(img.getId())
+                            .url("/api/v1/vehicle-images/" + img.getId() + "/data")
+                            .main(img.isMain())
+                            .sortOrder(img.getSortOrder())
+                            .build())
+                    .collect(Collectors.toList()));
+        }
+
+        return dto;
     }
 
     public LocationDto toLocationDto(Location location) {
@@ -141,12 +154,16 @@ public class RentalMapper {
                 .build();
     }
 
-    public VehiclePhotosDto toVehiclePhotosDto(VehiclePhotos photo) {
-        if (photo == null) return null;
-        return VehiclePhotosDto.builder()
-                .id(photo.getId())
-                .url(photo.getUrl())
-                .sortOrder(photo.getSortOrder())
+    public VehicleImageDto toVehicleImageDto(VehicleImage image) {
+        if (image == null) return null;
+        return VehicleImageDto.builder()
+                .id(image.getId())
+                .vehicleId(image.getVehicle().getId())
+                .filename(image.getFilename())
+                .mimeType(image.getMimeType())
+                .main(image.isMain())
+                .sortOrder(image.getSortOrder())
+                .url("/api/v1/vehicle-images/" + image.getId() + "/data")
                 .build();
     }
 }
