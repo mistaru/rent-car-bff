@@ -34,7 +34,7 @@ public class VehicleDto {
     private Long pricingTemplateId;
     private Long locationId;
 
-    private List<VehiclePhotosDto> photos;
+    private List<VehicleImageDto> photos;
 
     /** Dynamic vehicle attributes: code -> value, e.g. {"SEATS": "5", "COLOR": "Black"} */
     private Map<String, String> attributes;

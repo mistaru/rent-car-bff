@@ -14,6 +14,7 @@ spring:
     multipart:
       max-file-size: 150MB
       max-request-size: 150MB
+      enabled: true
   datasource:
     hikari:
       connection-timeout: ${JDBC_CONNECTION_TIMEOUT:120000}

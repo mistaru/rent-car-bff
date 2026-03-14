@@ -141,12 +141,16 @@ public class RentalMapper {
                 .build();
     }
 
-    public VehiclePhotosDto toVehiclePhotosDto(VehiclePhotos photo) {
-        if (photo == null) return null;
-        return VehiclePhotosDto.builder()
-                .id(photo.getId())
-                .url(photo.getUrl())
-                .sortOrder(photo.getSortOrder())
+    public VehicleImageDto toVehicleImageDto(VehicleImage image) {
+        if (image == null) return null;
+        return VehicleImageDto.builder()
+                .id(image.getId())
+                .vehicleId(image.getVehicle().getId())
+                .filename(image.getFilename())
+                .mimeType(image.getMimeType())
+                .main(image.isMain())
+                .sortOrder(image.getSortOrder())
+                .url("/api/v1/vehicle-images/" + image.getId() + "/data")
                 .build();
     }
 }
