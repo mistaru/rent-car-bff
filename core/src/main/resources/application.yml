@@ -3,7 +3,6 @@ spring:
   web:
     encoding:
       charset: UTF-8
-  cache.type: redis
   jpa:
     open-in-view: false
     hibernate:
