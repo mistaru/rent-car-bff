@@ -23,7 +23,6 @@ import kg.founders.core.settings.security.permission.annotation.ManualPermission
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.AuditorAware;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +39,6 @@ public class AuthControllerRest {
     LoginService loginService;
     AuditorAware<AuditModel> auditorAware;
 
-    @PreAuthorize("permitAll()")
     @PostMapping(value = "/public/auth/login")
     @ApiOperation("Возвращает токен")
     public ResponseMessage<String> login(
