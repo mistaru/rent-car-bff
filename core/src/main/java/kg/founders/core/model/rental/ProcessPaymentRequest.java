@@ -18,5 +18,10 @@ public class ProcessPaymentRequest {
 
     private String transactionId;
 
-    private boolean success;
+    private boolean isSuccessful;
+
+    @Override
+    public String toString() {
+        return  bookingId + "|" + transactionId + "|" + isSuccessful;
+    }
 }

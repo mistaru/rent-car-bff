@@ -1,5 +1,7 @@
 package kg.founders.core.model.rental;
 
+import kg.founders.core.enums.PaymentMethod;
+import kg.founders.core.enums.PaymentTransactionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,8 +15,8 @@ import java.time.LocalDateTime;
 public class PaymentDto {
     private final Long id;
     private final Long bookingId;
-    private final String method;
-    private final String status;
+    private final PaymentMethod method;
+    private final PaymentTransactionStatus status;
     private final BigDecimal amount;
     private final String transactionId;
     private final LocalDateTime createdAt;
