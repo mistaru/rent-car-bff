@@ -17,6 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,13 @@ public class PaymentService {
     private final VehicleRepository vehicleRepository;
     private final RentalMapper rentalMapper;
     private final BookingHistoryService bookingHistoryService;
+
+    @Transactional(readOnly = true)
+    public List<PaymentDto> getAllPayments() {
+        return paymentRepository.findAll().stream()
+                .map(rentalMapper::toPaymentDto)
+                .collect(Collectors.toList());
+    }
 
     @Transactional
     public PaymentDto initiatePayment(Long bookingId) {
@@ -56,17 +66,19 @@ public class PaymentService {
 
     @Transactional
     public PaymentDto processPayment(ProcessPaymentRequest request) {
-        Booking booking = bookingRepository.findByIdWithDetails(request.getBookingId())
+        Booking booking = new Booking();
+        Payment payment = new Payment();
+        try {
+        booking = bookingRepository.findByIdWithDetails(request.getBookingId())
                 .orElseThrow(() -> new NotFoundException("Booking not found with id: " + request.getBookingId()));
 
-        Payment payment = paymentRepository.findByBookingId(request.getBookingId()).stream()
+        payment = paymentRepository.findByBookingId(request.getBookingId()).stream()
                 .filter(p -> p.getStatus() == PaymentTransactionStatus.INITIATED)
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("No initiated payment found for booking: " + request.getBookingId()));
 
-        if (request.isSuccess()) {
             return handleSuccessfulPayment(booking, payment, request.getTransactionId());
-        } else {
+        } catch (Exception ex) {
             return handleFailedPayment(booking, payment);
         }
     }
