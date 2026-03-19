@@ -75,5 +75,5 @@ public class Vehicle {
 
     @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("sortOrder ASC")
-    private List<VehicleImage> photos = new ArrayList<>();
+    private List<VehicleImage> images = new ArrayList<>();
 }
