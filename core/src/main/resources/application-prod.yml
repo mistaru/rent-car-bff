@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/rentcar}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/rent_car}
+    username: ${SPRING_DATASOURCE_USERNAME:rent_car}
+    password: ${SPRING_DATASOURCE_PASSWORD:qwerty1234}
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 12000

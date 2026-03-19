@@ -28,7 +28,7 @@ public class VehicleImageController {
         return ResponseEntity.ok(imageService.getImagesByVehicleId(vehicleId));
     }
 
-    /** Отдать бинарник (используется как <img :src="...">)*/
+    /** Отдать бинарник (используется как <img :src="...">) */
     @ManualPermissionControl
     @GetMapping("/{id}/data")
     public ResponseEntity<byte[]> getData(@PathVariable Long id) {

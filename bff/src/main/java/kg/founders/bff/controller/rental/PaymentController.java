@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/payments")
@@ -18,6 +19,12 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
+    @ManualPermissionControl
+    @GetMapping
+    public ResponseEntity<List<PaymentDto>> getAllPayments() {
+        return ResponseEntity.ok(paymentService.getAllPayments());
+    }
+    
     @ManualPermissionControl
     @PostMapping("/initiate/{bookingId}")
     public ResponseEntity<PaymentDto> initiatePayment(@PathVariable Long bookingId) {
