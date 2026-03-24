@@ -27,7 +27,7 @@ spring:
         prep-stmt-cache-size: ${JDBC_PREP_STMT_CACHE_SIZE:250}
         prep-stmt-cache-sql-limit: ${JDBC_PREP_STMT_CACHE_SQL_LIMIT:2048}
   liquibase:
-    enabled: false
+    enabled: true
     contexts: liqui-test, liqui-dev
     change-log: classpath:db/changelog/db.master.xml
   file:

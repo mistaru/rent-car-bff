@@ -1,8 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
-<!--    <changeSet author="arkasymov" id="user_creation_admin" context="liqui-test">-->
-<!--        <sqlFile relativeToChangelogFile="true" encoding="utf8" path="../scripts/001_ADMIN_ROLES.sql"/>-->
-<!--    </changeSet>-->
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="1" author="atabyldyev" context="liqui-dev">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="vehicle_images"/>
+            <columnExists tableName="vehicle_images" columnName="data"/>
+        </preConditions>
+
+        <!-- Проверяем тип колонки через SQL запрос -->
+        <sql>
+            ALTER TABLE vehicle_images DROP COLUMN IF EXISTS data;
+        </sql>
+        <sql>
+            ALTER TABLE vehicle_images ADD COLUMN data bytea;
+        </sql>
+        <sql>
+            UPDATE vehicle_images SET data = '\x00' WHERE data IS NULL;
+        </sql>
+        <sql>
+            ALTER TABLE vehicle_images ALTER COLUMN data SET NOT NULL;
+        </sql>
+        <sql>
+            ALTER TABLE vehicle_images ALTER COLUMN data SET DEFAULT '\x00';
+        </sql>
+        <sql>
+            ALTER TABLE vehicle_images ALTER COLUMN data DROP DEFAULT;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
