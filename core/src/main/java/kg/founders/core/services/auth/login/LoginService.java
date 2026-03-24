@@ -1,4 +1,4 @@
-package kg.founders.core.services.login;
+package kg.founders.core.services.auth.login;
 
 import kg.founders.core.entity.auth.Auth;
 import kg.founders.core.model.login.LoginModel;

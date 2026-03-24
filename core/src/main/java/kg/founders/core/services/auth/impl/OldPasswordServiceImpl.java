@@ -1,8 +1,8 @@
-package kg.founders.core.services.impl;
+package kg.founders.core.services.auth.impl;
 
 import kg.founders.core.entity.OldPassword;
 import kg.founders.core.repo.OldPasswordRepo;
-import kg.founders.core.services.OldPasswordService;
+import kg.founders.core.services.auth.OldPasswordService;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;

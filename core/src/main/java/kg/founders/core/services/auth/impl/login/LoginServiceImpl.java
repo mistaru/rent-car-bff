@@ -1,4 +1,4 @@
-package kg.founders.core.services.impl.login;
+package kg.founders.core.services.auth.impl.login;
 
 
 import com.google.common.base.Strings;
@@ -7,8 +7,8 @@ import kg.founders.core.exceptions.*;
 import kg.founders.core.entity.auth.Auth;
 import kg.founders.core.model.login.LoginModel;
 import kg.founders.core.services.auth.AuthService;
-import kg.founders.core.services.login.LoginService;
-import kg.founders.core.services.login.LoginHistoryService;
+import kg.founders.core.services.auth.login.LoginService;
+import kg.founders.core.services.auth.login.LoginHistoryService;
 import kg.founders.core.settings.jwt.TokenService;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;

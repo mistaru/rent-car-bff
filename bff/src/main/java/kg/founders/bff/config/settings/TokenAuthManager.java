@@ -2,7 +2,7 @@ package kg.founders.bff.config.settings;
 
 import kg.founders.core.exceptions.ForbiddenException;
 import kg.founders.core.services.auth.AuthService;
-import kg.founders.core.services.login.LoginService;
+import kg.founders.core.services.auth.login.LoginService;
 import kg.founders.core.settings.jwt.TokenService;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.authentication.AuthenticationManager;

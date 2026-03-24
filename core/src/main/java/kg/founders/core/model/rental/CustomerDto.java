@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Builder
-public class CustomerDto {
+public class CustomerDto implements CustomerData {
     private final Long id;
     private final String fullName;
     private final String email;

@@ -1,4 +1,4 @@
-package kg.founders.core.services.impl.auth;
+package kg.founders.core.services.auth.impl.auth;
 
 import com.google.common.base.Strings;
 import com.lambdaworks.crypto.SCryptUtil;
@@ -12,7 +12,7 @@ import kg.founders.core.exceptions.ValidationException;
 import kg.founders.core.model.audit.AuditModel;
 import kg.founders.core.model.auth.AuthModel;
 import kg.founders.core.model.login.PasswordChangeModel;
-import kg.founders.core.services.OldPasswordService;
+import kg.founders.core.services.auth.OldPasswordService;
 import kg.founders.core.services.auth.AuthService;
 import kg.founders.core.services.auth.role.AuthRoleService;
 import kg.founders.core.services.auth.role.RoleService;

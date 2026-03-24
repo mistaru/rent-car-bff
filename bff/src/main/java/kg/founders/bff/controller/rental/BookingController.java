@@ -5,8 +5,8 @@ import kg.founders.core.model.rental.BookingDto;
 import kg.founders.core.model.rental.BookingHistoryDto;
 import kg.founders.core.model.rental.CreateBookingRequest;
 import kg.founders.core.model.rental.UpdateBookingRequest;
-import kg.founders.core.services.rental.BookingHistoryService;
 import kg.founders.core.services.rental.BookingService;
+import kg.founders.core.services.rental.impl.BookingHistoryServiceImpl;
 import kg.founders.core.settings.security.permission.annotation.ManualPermissionControl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,7 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService bookingService;
-    private final BookingHistoryService bookingHistoryService;
+    private final BookingHistoryServiceImpl bookingHistoryService;
 
     @ManualPermissionControl
     @PostMapping

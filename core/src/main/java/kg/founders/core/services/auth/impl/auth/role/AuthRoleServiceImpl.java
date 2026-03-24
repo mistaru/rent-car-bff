@@ -1,4 +1,4 @@
-package kg.founders.core.services.impl.auth.role;
+package kg.founders.core.services.auth.impl.auth.role;
 
 import kg.founders.core.data_access_layer.dao.AuthRoleDao;
 import kg.founders.core.data_access_layer.repo.auth.AuthRoleRepo;

@@ -1,4 +1,4 @@
-package kg.founders.core.services.impl.auth.role.permission;
+package kg.founders.core.services.auth.impl.auth.role.permission;
 
 import kg.founders.core.entity.auth.permission.Permission;
 import kg.founders.core.enums.permission.PermissionType;

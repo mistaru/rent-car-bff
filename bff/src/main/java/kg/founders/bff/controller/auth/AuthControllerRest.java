@@ -16,7 +16,7 @@ import kg.founders.core.model.auth.AuthModel;
 import kg.founders.core.model.login.LoginModel;
 import kg.founders.core.model.login.PasswordChangeModel;
 import kg.founders.core.services.auth.AuthService;
-import kg.founders.core.services.login.LoginService;
+import kg.founders.core.services.auth.login.LoginService;
 import kg.founders.core.settings.security.permission.annotation.HasAccess;
 import kg.founders.core.settings.security.permission.annotation.HasPermission;
 import kg.founders.core.settings.security.permission.annotation.ManualPermissionControl;

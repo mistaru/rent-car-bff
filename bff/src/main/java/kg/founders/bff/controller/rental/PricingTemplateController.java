@@ -2,7 +2,7 @@ package kg.founders.bff.controller.rental;
 
 import kg.founders.core.model.rental.CreatePricingTemplateRequest;
 import kg.founders.core.model.rental.PricingTemplateDto;
-import kg.founders.core.services.rental.PricingTemplateService;
+import kg.founders.core.services.rental.impl.PricingTemplateServiceImpl;
 import kg.founders.core.settings.security.permission.annotation.ManualPermissionControl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PricingTemplateController {
 
-    private final PricingTemplateService templateService;
+    private final PricingTemplateServiceImpl templateService;
 
     /** Получить все шаблоны тарифов */
     @ManualPermissionControl

@@ -1,4 +1,4 @@
-package kg.founders.core.services;
+package kg.founders.core.services.auth;
 
 
 import kg.founders.core.entity.OldPassword;

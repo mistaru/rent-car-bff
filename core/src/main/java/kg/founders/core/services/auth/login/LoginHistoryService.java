@@ -1,4 +1,4 @@
-package kg.founders.core.services.login;
+package kg.founders.core.services.auth.login;
 
 public interface LoginHistoryService {
     boolean isLoginAttemptsExceeded(String login);

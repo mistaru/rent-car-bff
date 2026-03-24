@@ -1,4 +1,4 @@
-package kg.founders.core.services.impl.auth.role.permission;
+package kg.founders.core.services.auth.impl.auth.role.permission;
 
 import kg.founders.core.data_access_layer.repo.permission.RolePermissionRepo;
 import kg.founders.core.entity.auth.permission.RolePermission;

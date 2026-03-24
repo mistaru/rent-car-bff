@@ -1,8 +1,8 @@
-package kg.founders.core.services.impl.login;
+package kg.founders.core.services.auth.impl.login;
 
 import kg.founders.core.data_access_layer.dao.LoginHistoryDao;
 import kg.founders.core.entity.LoginHistory;
-import kg.founders.core.services.login.LoginHistoryService;
+import kg.founders.core.services.auth.login.LoginHistoryService;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;

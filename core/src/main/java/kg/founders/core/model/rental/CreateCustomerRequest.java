@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateCustomerRequest {
+public class CreateCustomerRequest implements CustomerData {
 
     @NotBlank(message = "Full name is required")
     private String fullName;
