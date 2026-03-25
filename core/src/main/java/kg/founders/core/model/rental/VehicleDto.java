@@ -20,10 +20,6 @@ public class VehicleDto {
     private String brand;
     private String model;
     private String licensePlate;
-    private String bodyType;
-    private String drivetrain;
-    private String fuelType;
-    private String transmission;
     private BigDecimal pricePerDay;
     /** Минимальная цена из тарифного шаблона (для каталога — «от X $») */
     private BigDecimal minPricePerDay;

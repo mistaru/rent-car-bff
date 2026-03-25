@@ -22,6 +22,9 @@ public interface VehicleAttributeService {
     @Transactional
     void deleteAttribute(Long id);
 
+    @Transactional
+    void deleteAttributeValueByVehicleId(Long vehicleId);
+
     @Transactional(readOnly = true)
     List<VehicleAttributeDto> getFilterableAttributes();
 

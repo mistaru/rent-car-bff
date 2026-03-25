@@ -38,14 +38,6 @@ public class Vehicle {
     @Column(nullable = false)
     private String licensePlate;
 
-    private String bodyType;
-
-    private String drivetrain;
-
-    private String fuelType;
-
-    private String transmission;
-
     @Column(length = 1024)
     private String image;
 

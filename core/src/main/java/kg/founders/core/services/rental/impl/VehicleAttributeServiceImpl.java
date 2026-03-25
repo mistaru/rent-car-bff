@@ -87,6 +87,13 @@ public class VehicleAttributeServiceImpl implements VehicleAttributeService {
         log.info("Deleted vehicle attribute id={}", id);
     }
 
+    @Transactional
+    @Override
+    public void deleteAttributeValueByVehicleId(Long vehicleId) {
+        valueRepository.deleteByVehicleId(vehicleId);
+        log.info("Deleted vehicle value attributes vehicle_id={}", vehicleId);
+    }
+
     // ===================== Фильтры для каталога =====================
 
     /**

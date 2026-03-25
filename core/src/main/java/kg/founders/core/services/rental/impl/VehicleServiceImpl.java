@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -66,10 +65,12 @@ public class VehicleServiceImpl implements VehicleService {
     @Transactional(readOnly = true)
     @Override
     public List<VehicleDto> getAllVehicles() {
-        return vehicleRepository.findAll(Sort.by("id").descending())
-                .stream()
-                .map(vehicleConverter::convertFromEntity)
-                .collect(Collectors.toList());
+        List<Vehicle> vehicles = vehicleRepository.findAll(Sort.by("id").descending());
+        List<VehicleDto> vehicleDtos = vehicles.stream().map(vehicleConverter::convertFromEntity).toList();
+        // Enrich with dynamic attributes
+        vehicleDtos.forEach(vehicleDto ->
+                vehicleDto.setAttributes(vehicleAttributeService.getVehicleAttributeValues(vehicleDto.getId())));
+        return vehicleDtos;
     }
 
     @Transactional
@@ -83,10 +84,6 @@ public class VehicleServiceImpl implements VehicleService {
                 .brand(dto.getBrand())
                 .model(dto.getModel())
                 .licensePlate(dto.getLicensePlate())
-                .bodyType(dto.getBodyType())
-                .drivetrain(dto.getDrivetrain())
-                .fuelType(dto.getFuelType())
-                .transmission(dto.getTransmission())
                 .image(dto.getImage())
                 .carClass(dto.getCarClass())
                 .pricePerDay(dto.getPricePerDay())
@@ -101,6 +98,12 @@ public class VehicleServiceImpl implements VehicleService {
         }
 
         vehicle = vehicleRepository.save(vehicle);
+
+        // Save vehicle attribute values
+        if (dto.getAttributes() != null && !dto.getAttributes().isEmpty()) {
+            vehicleAttributeService.setVehicleAttributes(vehicle.getId(), dto.getAttributes());
+        }
+
         log.info("Created vehicle id={} brand={} model={}", vehicle.getId(), vehicle.getBrand(), vehicle.getModel());
         return vehicleConverter.convertFromEntity(vehicle);
     }
@@ -114,10 +117,6 @@ public class VehicleServiceImpl implements VehicleService {
         vehicle.setBrand(dto.getBrand());
         vehicle.setModel(dto.getModel());
         if (dto.getLicensePlate() != null) vehicle.setLicensePlate(dto.getLicensePlate());
-        vehicle.setBodyType(dto.getBodyType());
-        vehicle.setDrivetrain(dto.getDrivetrain());
-        vehicle.setFuelType(dto.getFuelType());
-        vehicle.setTransmission(dto.getTransmission());
         vehicle.setImage(dto.getImage());
         vehicle.setCarClass(dto.getCarClass());
         vehicle.setPricePerDay(dto.getPricePerDay());
@@ -141,6 +140,12 @@ public class VehicleServiceImpl implements VehicleService {
         }
 
         vehicle = vehicleRepository.save(vehicle);
+
+        // Update vehicle attribute values
+        if (dto.getAttributes() != null && !dto.getAttributes().isEmpty()) {
+            vehicleAttributeService.setVehicleAttributes(vehicle.getId(), dto.getAttributes());
+        }
+
         log.info("Updated vehicle id={}", vehicle.getId());
         return vehicleConverter.convertFromEntity(vehicle);
     }
@@ -151,6 +156,7 @@ public class VehicleServiceImpl implements VehicleService {
         if (!vehicleRepository.existsById(id)) {
             throw new NotFoundException("Vehicle not found with id: " + id);
         }
+        vehicleAttributeService.deleteAttributeValueByVehicleId(id);
         vehicleRepository.deleteById(id);
         log.info("Deleted vehicle id={}", id);
     }

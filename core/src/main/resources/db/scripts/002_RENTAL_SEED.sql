@@ -24,28 +24,27 @@ SELECT setval('locations_id_seq', 6);
 -- =============================================
 -- 2. Vehicles (20 автомобилей)
 -- =============================================
-INSERT INTO vehicles (id, brand, model, license_plate, body_type, drivetrain, fuel_type, transmission, image, car_class, price_per_day, status, location_id, version) VALUES
-    (1,  'Toyota',        'Camry',          '01KG777ABC', 'Sedan', 'FWD', 'Gasoline', 'Automatic', 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=600&h=400&fit=crop',  'Standard Sedan',   75.00, 'AVAILABLE', 1, 0),
-    (2,  'BMW',           'X5',             '01KG888DEF', 'SUV',   'AWD', 'Gasoline', 'Automatic', 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=600&h=400&fit=crop',  'Premium SUV',     150.00, 'AVAILABLE', 1, 0),
-    (3,  'Mercedes-Benz', 'S-Class',        '01KG999GHI', 'Sedan', 'AWD', 'Gasoline', 'Automatic', 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&h=400&fit=crop',  'Luxury Sedan',    320.00, 'AVAILABLE', 2, 0),
-    (4,  'Hyundai',       'Tucson',         '01KG111JKL', 'SUV',   'FWD', 'Gasoline', 'Automatic', 'https://images.unsplash.com/photo-1633695632073-30f4e8e6b6e3?w=600&h=400&fit=crop',  'Compact SUV',      60.00, 'AVAILABLE', 2, 0),
-    (5,  'Lexus',         'RX350',          '01KG222MNO', 'SUV',   'AWD', 'Gasoline', 'Automatic', 'https://images.unsplash.com/photo-1622126807280-9b5b32b44e68?w=600&h=400&fit=crop',  'Premium SUV',     180.00, 'AVAILABLE', 3, 0),
-    (6,  'Kia',           'Sportage',       '01KG333PQR', 'SUV',   'FWD', 'Gasoline', 'Automatic', 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=600&h=400&fit=crop',  'Compact SUV',      50.00, 'AVAILABLE', 3, 0),
-    (7,  'Toyota',        'Land Cruiser',   '01KG444STU', 'SUV',   'AWD', 'Diesel',   'Automatic', 'https://images.unsplash.com/photo-1594611396050-1f36031e1eaf?w=600&h=400&fit=crop',  'Full-Size SUV',   250.00, 'RESERVED',  4, 0),
-    (8,  'Chevrolet',     'Malibu',         '01KG555VWX', 'Sedan', 'FWD', 'Gasoline', 'Automatic', 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=600&h=400&fit=crop',  'Standard Sedan',   65.00, 'AVAILABLE', 4, 0),
-    (9,  'Audi',          'A6',             '01KG600AAA', 'Sedan', 'AWD', 'Gasoline', 'Automatic', 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=600&h=400&fit=crop',  'Premium Sedan',   200.00, 'AVAILABLE', 1, 0),
-    (10, 'Tesla',         'Model 3',        '01KG601BBB', 'Sedan', 'AWD', 'Electric', 'Automatic', 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=600&h=400&fit=crop',  'Electric Sedan',  190.00, 'AVAILABLE', 2, 0),
-    (11, 'Porsche',       'Cayenne',        '01KG602CCC', 'SUV',   'AWD', 'Gasoline', 'Automatic', 'https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=600&h=400&fit=crop',  'Luxury SUV',      400.00, 'RESERVED',  2, 0),
-    (12, 'Volkswagen',    'Tiguan',         '01KG603DDD', 'SUV',   'FWD', 'Gasoline', 'Automatic', 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=600&h=400&fit=crop',  'Compact SUV',      70.00, 'AVAILABLE', 3, 0),
-    (13, 'Range Rover',   'Sport',          '01KG604EEE', 'SUV',   'AWD', 'Diesel',   'Automatic', 'https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=600&h=400&fit=crop',  'Luxury SUV',      450.00, 'RESERVED',  1, 0),
-    (14, 'Honda',         'Civic',          '01KG605FFF', 'Sedan', 'FWD', 'Gasoline', 'Automatic', 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&h=400&fit=crop',  'Standard Sedan',   55.00, 'AVAILABLE', 4, 0),
-    (15, 'BMW',           '3 Series',       '01KG606GGG', 'Sedan', 'RWD', 'Gasoline', 'Automatic', 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=600&h=400&fit=crop',  'Premium Sedan',   170.00, 'AVAILABLE', 5, 0),
-    (16, 'Toyota',        'RAV4',           '01KG607HHH', 'SUV',   'AWD', 'Hybrid',   'Automatic', 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=600&h=400&fit=crop',  'Compact SUV',      85.00, 'AVAILABLE', 5, 0),
-    (17, 'Mercedes-Benz', 'GLE',            '01KG608III', 'SUV',   'AWD', 'Diesel',   'Automatic', 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&h=400&fit=crop',  'Premium SUV',     280.00, 'AVAILABLE', 6, 0),
-    (18, 'Nissan',        'Qashqai',        '01KG609JJJ', 'SUV',   'FWD', 'Gasoline', 'Automatic', 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=600&h=400&fit=crop',  'Compact SUV',      45.00, 'AVAILABLE', 6, 0),
-    (19, 'Ford',          'Mustang',        '01KG610KKK', 'Coupe', 'RWD', 'Gasoline', 'Manual',    'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=600&h=400&fit=crop',  'Sports Car',      350.00, 'RESERVED',  1, 0),
-    (20, 'Toyota',        'Corolla',        '01KG611LLL', 'Sedan', 'FWD', 'Hybrid',   'Automatic', 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&h=400&fit=crop',  'Economy Sedan',    40.00, 'AVAILABLE', 2, 0);
-
+INSERT INTO vehicles (id, brand, model, license_plate, image, car_class, price_per_day, status, location_id, version) VALUES
+    (1,  'Toyota',        'Camry',          '01KG777ABC', 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=600&h=400&fit=crop',  'Standard Sedan',   75.00, 'AVAILABLE', 1, 0),
+    (2,  'BMW',           'X5',             '01KG888DEF', 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=600&h=400&fit=crop',  'Premium SUV',     150.00, 'AVAILABLE', 1, 0),
+    (3,  'Mercedes-Benz', 'S-Class',        '01KG999GHI', 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&h=400&fit=crop',  'Luxury Sedan',    320.00, 'AVAILABLE', 2, 0),
+    (4,  'Hyundai',       'Tucson',         '01KG111JKL', 'https://images.unsplash.com/photo-1633695632073-30f4e8e6b6e3?w=600&h=400&fit=crop',  'Compact SUV',      60.00, 'AVAILABLE', 2, 0),
+    (5,  'Lexus',         'RX350',          '01KG222MNO', 'https://images.unsplash.com/photo-1622126807280-9b5b32b44e68?w=600&h=400&fit=crop',  'Premium SUV',     180.00, 'AVAILABLE', 3, 0),
+    (6,  'Kia',           'Sportage',       '01KG333PQR', 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=600&h=400&fit=crop',  'Compact SUV',      50.00, 'AVAILABLE', 3, 0),
+    (7,  'Toyota',        'Land Cruiser',   '01KG444STU', 'https://images.unsplash.com/photo-1594611396050-1f36031e1eaf?w=600&h=400&fit=crop',  'Full-Size SUV',   250.00, 'RESERVED',  4, 0),
+    (8,  'Chevrolet',     'Malibu',         '01KG555VWX', 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=600&h=400&fit=crop',  'Standard Sedan',   65.00, 'AVAILABLE', 4, 0),
+    (9,  'Audi',          'A6',             '01KG600AAA', 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=600&h=400&fit=crop',  'Premium Sedan',   200.00, 'AVAILABLE', 1, 0),
+    (10, 'Tesla',         'Model 3',        '01KG601BBB', 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=600&h=400&fit=crop',  'Electric Sedan',  190.00, 'AVAILABLE', 2, 0),
+    (11, 'Porsche',       'Cayenne',        '01KG602CCC', 'https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=600&h=400&fit=crop',  'Luxury SUV',      400.00, 'RESERVED',  2, 0),
+    (12, 'Volkswagen',    'Tiguan',         '01KG603DDD', 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=600&h=400&fit=crop',  'Compact SUV',      70.00, 'AVAILABLE', 3, 0),
+    (13, 'Range Rover',   'Sport',          '01KG604EEE', 'https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=600&h=400&fit=crop',  'Luxury SUV',      450.00, 'RESERVED',  1, 0),
+    (14, 'Honda',         'Civic',          '01KG605FFF', 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&h=400&fit=crop',  'Standard Sedan',   55.00, 'AVAILABLE', 4, 0),
+    (15, 'BMW',           '3 Series',       '01KG606GGG', 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=600&h=400&fit=crop',  'Premium Sedan',   170.00, 'AVAILABLE', 5, 0),
+    (16, 'Toyota',        'RAV4',           '01KG607HHH', 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=600&h=400&fit=crop',  'Compact SUV',      85.00, 'AVAILABLE', 5, 0),
+    (17, 'Mercedes-Benz', 'GLE',            '01KG608III', 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&h=400&fit=crop',  'Premium SUV',     280.00, 'AVAILABLE', 6, 0),
+    (18, 'Nissan',        'Qashqai',        '01KG609JJJ', 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=600&h=400&fit=crop',  'Compact SUV',      45.00, 'AVAILABLE', 6, 0),
+    (19, 'Ford',          'Mustang',        '01KG610KKK', 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=600&h=400&fit=crop',  'Sports Car',      350.00, 'RESERVED',  1, 0),
+    (20, 'Toyota',        'Corolla',        '01KG611LLL', 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&h=400&fit=crop',  'Economy Sedan',    40.00, 'AVAILABLE', 2, 0);
 SELECT setval('vehicles_id_seq', 20);
 
 -- =============================================
