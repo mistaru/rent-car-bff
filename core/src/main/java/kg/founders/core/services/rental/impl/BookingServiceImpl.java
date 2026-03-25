@@ -7,9 +7,7 @@ import kg.founders.core.exceptions.*;
 import kg.founders.core.model.rental.*;
 import kg.founders.core.repo.*;
 import kg.founders.core.services.event.BookingCreatedEvent;
-import kg.founders.core.services.rental.AvailabilityService;
-import kg.founders.core.services.rental.BookingService;
-import kg.founders.core.services.rental.PricingService;
+import kg.founders.core.services.rental.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,8 +31,9 @@ public class BookingServiceImpl implements BookingService {
     private final LocationRepository locationRepository;
     private final AvailabilityService availabilityService;
     private final PricingService pricingService;
+    private final PaymentService paymentService;
     private final ApplicationEventPublisher eventPublisher;
-    private final BookingHistoryServiceImpl bookingHistoryService;
+    private final BookingHistoryService bookingHistoryService;
     private final BookingConverter bookingConverter;
 
     @Transactional
@@ -221,6 +220,8 @@ public class BookingServiceImpl implements BookingService {
         Vehicle vehicle = booking.getVehicle();
         vehicle.setStatus(VehicleStatus.AVAILABLE);
         vehicleRepository.save(vehicle);
+
+        paymentService.deletePaymentByBookingId(bookingId);
 
         booking = bookingRepository.save(booking);
         log.info("Booking {} cancelled", bookingId);

@@ -15,4 +15,6 @@ public interface PaymentService {
 
     @Transactional
     PaymentDto processPayment(ProcessPaymentRequest request);
+
+    void deletePaymentByBookingId(Long bookingId);
 }

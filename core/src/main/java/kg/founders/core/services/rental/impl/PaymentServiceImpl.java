@@ -86,6 +86,16 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
+    @Override
+    public void deletePaymentByBookingId(Long bookingId) {
+        Payment payment = paymentRepository.findByBookingId(bookingId).stream()
+                .filter(p -> p.getStatus() == PaymentTransactionStatus.INITIATED)
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("No initiated payment found for booking: " + bookingId));
+
+        paymentRepository.delete(payment);
+    }
+
     private PaymentDto handleSuccessfulPayment(Booking booking, Payment payment, String transactionId) {
         // Update payment
         payment.setStatus(PaymentTransactionStatus.SUCCESS);
