@@ -34,5 +34,29 @@ spring:
     path: ${FILES_PATH_NAME:files}
     algorithm: SHA3-256
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: smtp.gmail.com
+            checkserveridentity: false
+        debug: false
+    default-encoding: UTF-8
+
+app:
+  mail:
+    from: ${MAIL_USERNAME:}
+    admin-email: admin@ironhorseasia.com
+    admin-whatsapp: "+996500000123"
+
 server:
   port: 8081

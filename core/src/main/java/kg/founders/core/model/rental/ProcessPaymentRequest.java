@@ -1,5 +1,6 @@
 package kg.founders.core.model.rental;
 
+import kg.founders.core.enums.PaymentMethod;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,10 +19,12 @@ public class ProcessPaymentRequest {
 
     private String transactionId;
 
-    private boolean isSuccessful;
+    private String success;
+
+    private PaymentMethod paymentMethod;
 
     @Override
     public String toString() {
-        return  bookingId + "|" + transactionId + "|" + isSuccessful;
+        return  bookingId + "|" + transactionId + "|" + success;
     }
 }

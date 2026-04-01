@@ -34,6 +34,7 @@ public class BookingServiceImpl implements BookingService {
     private final PaymentService paymentService;
     private final ApplicationEventPublisher eventPublisher;
     private final BookingHistoryService bookingHistoryService;
+    private final BookingEmailService bookingEmailService;
     private final BookingConverter bookingConverter;
 
     @Transactional
@@ -83,19 +84,7 @@ public class BookingServiceImpl implements BookingService {
         LocalDate serviceBlockStart = request.getPickupDate().minusDays(1);
         LocalDate serviceBlockEnd = request.getDropoffDate().plusDays(1);
 
-        // 6. Determine booking status based on payment method
-        BookingStatus bookingStatus;
-        PaymentStatus paymentStatus;
-
-        if (request.getPaymentMethod() == PaymentMethod.ONLINE) {
-            bookingStatus = BookingStatus.PENDING_PAYMENT;
-            paymentStatus = PaymentStatus.UNPAID;
-        } else {
-            bookingStatus = BookingStatus.CONFIRMED;
-            paymentStatus = PaymentStatus.UNPAID;
-        }
-
-        // 7. Build booking with fixed pricing
+        // 6. Build booking with fixed pricing
         Booking booking = Booking.builder()
                 .vehicle(vehicle)
                 .customer(customer)
@@ -115,12 +104,12 @@ public class BookingServiceImpl implements BookingService {
                 .serviceBlockStart(serviceBlockStart)
                 .serviceBlockEnd(serviceBlockEnd)
                 .currency(currency)
-                .status(bookingStatus)
-                .paymentStatus(paymentStatus)
+                .status(BookingStatus.PENDING_PAYMENT)
+                .paymentStatus(PaymentStatus.UNPAID)
                 .addOns(new ArrayList<>())
                 .build();
 
-        // 8. Add add-ons
+        // 7. Add add-ons
         if (request.getAddOns() != null) {
             for (AddOnType addOnType : request.getAddOns()) {
                 BookingAddOn addOn = BookingAddOn.builder()
@@ -132,14 +121,17 @@ public class BookingServiceImpl implements BookingService {
             }
         }
 
-        // 9. Set vehicle to RESERVED
+        // 8. Set vehicle to RESERVED
         vehicle.setStatus(VehicleStatus.RESERVED);
         vehicleRepository.save(vehicle);
 
-        // 10. Save booking
+        // 9. Save booking
         booking = bookingRepository.save(booking);
-        log.info("Booking created with id: {}, status: {}, prepayment: {}",
-                booking.getId(), bookingStatus, price.getPrepaymentAmount());
+        log.info("Booking created with id: {}, prepayment: {}",
+                booking.getId(), price.getPrepaymentAmount());
+
+        // 10. Send confirmation email
+        bookingEmailService.sendBookingConfirmation(booking);
 
         // 11. Publish event
         eventPublisher.publishEvent(
