@@ -11,14 +11,14 @@ import kg.founders.core.services.rental.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Sort;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -29,6 +29,7 @@ public class BookingServiceImpl implements BookingService {
     private final VehicleRepository vehicleRepository;
     private final CustomerRepository customerRepository;
     private final LocationRepository locationRepository;
+    private final ServiceOptionRepository serviceOptionRepository;
     private final AvailabilityService availabilityService;
     private final PricingService pricingService;
     private final PaymentService paymentService;
@@ -364,5 +365,56 @@ public class BookingServiceImpl implements BookingService {
         if (days < 1) {
             throw new BadRequestException("Minimum rental period is 1 day");
         }
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<BookingTableCalendarRow> getTableCalendarData(LocalDate from, LocalDate to) {
+        List<Booking> bookings = bookingRepository.findForCalendar(from, to);
+
+        // Group by vehicle
+        Map<Long, BookingTableCalendarRow> rowMap = new LinkedHashMap<>();
+
+        for (Booking booking : bookings) {
+            Vehicle v = booking.getVehicle();
+            BookingTableCalendarRow row = rowMap.computeIfAbsent(v.getId(), id -> BookingTableCalendarRow.builder()
+                    .id(v.getId())
+                    .brand(v.getBrand())
+                    .model(v.getModel())
+                    .licensePlate(v.getLicensePlate())
+                    .bookings(new ArrayList<>())
+                    .build());
+
+            List<String> addOnNames = new ArrayList<>();
+
+            for (BookingAddOn addOn : booking.getAddOns()) {
+                Optional<ServiceOption> serviceOption = serviceOptionRepository.findByCode(addOn.getAddOnType().name());
+                serviceOption.ifPresent(option -> addOnNames.add(option.getName()));
+            }
+
+            row.getBookings().add(BookingBarDto.builder()
+                    .id(booking.getId())
+                    .customerName(booking.getCustomer().getFullName())
+                    .customerEmail(booking.getCustomer().getEmail())
+                    .pickupDate(booking.getPickupDate().toString())
+                    .dropoffDate(booking.getDropoffDate().toString())
+                    .totalAmount(booking.getTotalAmount())
+                    .addOns(addOnNames)
+                    .status(booking.getStatus().name())
+                    .paymentStatus(booking.getPaymentStatus().name())
+                    .build());
+        }
+        // Also include vehicles that have NO bookings in range (so they show in calendar)
+        vehicleRepository.findAll(Sort.by("brand", "model")).forEach(v -> {
+            rowMap.computeIfAbsent(v.getId(), id -> BookingTableCalendarRow.builder()
+                    .id(v.getId())
+                    .brand(v.getBrand())
+                    .model(v.getModel())
+                    .licensePlate(v.getLicensePlate())
+                    .bookings(new ArrayList<>())
+                    .build());
+        });
+
+        return new ArrayList<>(rowMap.values());
     }
 }

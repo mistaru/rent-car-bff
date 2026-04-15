@@ -1,19 +1,17 @@
 package kg.founders.bff.controller.rental;
 
-import kg.founders.core.model.rental.BookingCalendarItem;
-import kg.founders.core.model.rental.BookingDto;
-import kg.founders.core.model.rental.BookingHistoryDto;
-import kg.founders.core.model.rental.CreateBookingRequest;
-import kg.founders.core.model.rental.UpdateBookingRequest;
+import kg.founders.core.model.rental.*;
 import kg.founders.core.services.rental.BookingService;
 import kg.founders.core.services.rental.impl.BookingHistoryServiceImpl;
 import kg.founders.core.settings.security.permission.annotation.ManualPermissionControl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -72,5 +70,13 @@ public class BookingController {
     @GetMapping("/calendar")
     public ResponseEntity<List<BookingCalendarItem>> getBookingsCalendar() {
         return ResponseEntity.ok(bookingService.getBookingsForCalendar());
+    }
+
+    @ManualPermissionControl
+    @GetMapping("/table-calendar")
+    public ResponseEntity<List<BookingTableCalendarRow>> getTableCalendar(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        return ResponseEntity.ok(bookingService.getTableCalendarData(from, to));
     }
 }

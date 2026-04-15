@@ -49,11 +49,28 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "ORDER BY b.createdAt DESC")
     List<Booking> findAllWithDetails();
 
-    /** Count how many active bookings currently use a given add-on (for inventory) */
+    /**
+     * Count how many active bookings currently use a given add-on (for inventory)
+     */
     @Query("SELECT COUNT(a) FROM BookingAddOn a " +
             "WHERE a.addOnType = :addOnType " +
             "AND a.booking.status NOT IN (kg.founders.core.enums.BookingStatus.CANCELLED) " +
             "AND a.booking.dropoffDate >= :today")
     long countActiveAddOnUsage(@Param("addOnType") AddOnType addOnType,
-                                @Param("today") LocalDate today);
+                               @Param("today") LocalDate today);
+
+    @Query("""
+                SELECT b FROM Booking b
+                JOIN FETCH b.vehicle v
+                JOIN FETCH b.customer c
+                LEFT JOIN FETCH b.addOns a
+                WHERE b.status <> 'CANCELLED'
+                  AND b.dropoffDate >= :from
+                  AND b.pickupDate  <= :to
+                ORDER BY v.brand ASC, v.model ASC, b.pickupDate ASC
+            """)
+    List<Booking> findForCalendar(
+            @Param("from") LocalDate from,
+            @Param("to") LocalDate to
+    );
 }
