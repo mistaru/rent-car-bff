@@ -104,13 +104,22 @@ public class BookingServiceImpl implements BookingService {
                 .addOns(new ArrayList<>())
                 .build();
 
-        // 6. Add add-ons
+        // 6. Validate inventory availability and add add-ons
+        serviceOptionService.validateInventoryAvailability(request.getAddOns(), null);
         if (request.getAddOns() != null) {
-            for (AddOnType addOnType : request.getAddOns()) {
+            for (AddOnRequest addOnReq : request.getAddOns()) {
+                AddOnType addOnType;
+                try {
+                    addOnType = AddOnType.valueOf(addOnReq.getCode());
+                } catch (IllegalArgumentException e) {
+                    log.warn("Unknown add-on code: {}, skipping", addOnReq.getCode());
+                    continue;
+                }
                 BookingAddOn addOn = BookingAddOn.builder()
                         .booking(booking)
                         .addOnType(addOnType)
                         .pricePerDay(addOnType.getPricePerDay())
+                        .quantity(addOnReq.getEffectiveQuantity())
                         .build();
                 booking.getAddOns().add(addOn);
             }
@@ -240,18 +249,19 @@ public class BookingServiceImpl implements BookingService {
             String oldDates = booking.getPickupDate() + " → " + booking.getDropoffDate();
             String newDates = newPickup + " → " + newDropoff;
 
-            booking.setPickupDate(newPickup.minusDays(1)); //Service block: +1 day before for maintenance
-            booking.setDropoffDate(newDropoff.plusDays(1)); //Service block: +1 day after for maintenance
+            booking.setPickupDate(newPickup);
+            booking.setDropoffDate(newDropoff);
             int days = (int) ChronoUnit.DAYS.between(newPickup, newDropoff);
             booking.setDays(days);
 
             // Пересчёт стоимости
+            List<AddOnRequest> currentAddOns = booking.getAddOns() != null
+                    ? booking.getAddOns().stream()
+                        .map(a -> AddOnRequest.builder().code(a.getAddOnType().name()).quantity(a.getQuantity()).build())
+                        .collect(java.util.stream.Collectors.toList())
+                    : null;
             PriceBreakdown price = pricingService.calculateForVehicle(
-                    booking.getVehicle().getId(), days,
-                    booking.getAddOns() != null
-                            ? booking.getAddOns().stream().map(BookingAddOn::getAddOnType).collect(java.util.stream.Collectors.toList())
-                            : null,
-                    booking.getCurrency());
+                    booking.getVehicle().getId(), days, currentAddOns, booking.getCurrency());
             booking.setPricePerDay(price.getPricePerDay());
             booking.setPriceTierDescription(price.getTierName());
             booking.setBaseAmount(price.getBaseAmount());
@@ -335,6 +345,71 @@ public class BookingServiceImpl implements BookingService {
         }
         if (customerChanged) {
             customerRepository.save(customer);
+        }
+
+        // Обновление доп. услуг
+        boolean addOnsChanged = false;
+        if (request.getAddOns() != null) {
+            // Валидация доступности инвентаря (исключаем текущее бронирование из подсчёта)
+            serviceOptionService.validateInventoryAvailability(request.getAddOns(), bookingId);
+
+            // Собираем старые для лога
+            String oldAddOns = booking.getAddOns() != null
+                    ? booking.getAddOns().stream()
+                        .map(a -> a.getAddOnType().name() + "×" + a.getQuantity())
+                        .collect(java.util.stream.Collectors.joining(", "))
+                    : "";
+
+            // Очищаем старые
+            if (booking.getAddOns() != null) {
+                booking.getAddOns().clear();
+            }
+
+            // Добавляем новые
+            for (AddOnRequest addOnReq : request.getAddOns()) {
+                AddOnType addOnType;
+                try {
+                    addOnType = AddOnType.valueOf(addOnReq.getCode());
+                } catch (IllegalArgumentException e) {
+                    log.warn("Unknown add-on code during update: {}, skipping", addOnReq.getCode());
+                    continue;
+                }
+                BookingAddOn addOn = BookingAddOn.builder()
+                        .booking(booking)
+                        .addOnType(addOnType)
+                        .pricePerDay(addOnType.getPricePerDay())
+                        .quantity(addOnReq.getEffectiveQuantity())
+                        .build();
+                booking.getAddOns().add(addOn);
+            }
+
+            String newAddOns = booking.getAddOns().stream()
+                    .map(a -> a.getAddOnType().name() + "×" + a.getQuantity())
+                    .collect(java.util.stream.Collectors.joining(", "));
+
+            if (!oldAddOns.equals(newAddOns)) {
+                addOnsChanged = true;
+                bookingHistoryService.logFieldChange(booking, "UPDATED", "addOns",
+                        oldAddOns, newAddOns, "system");
+            }
+        }
+
+        // Пересчёт стоимости если изменились даты или доп. услуги
+        if (!datesChanged && addOnsChanged) {
+            List<AddOnRequest> currentAddOns = booking.getAddOns() != null
+                    ? booking.getAddOns().stream()
+                        .map(a -> AddOnRequest.builder().code(a.getAddOnType().name()).quantity(a.getQuantity()).build())
+                        .collect(java.util.stream.Collectors.toList())
+                    : null;
+            PriceBreakdown price = pricingService.calculateForVehicle(
+                    booking.getVehicle().getId(), booking.getDays(), currentAddOns, booking.getCurrency());
+            booking.setPricePerDay(price.getPricePerDay());
+            booking.setPriceTierDescription(price.getTierName());
+            booking.setBaseAmount(price.getBaseAmount());
+            booking.setAddOnsAmount(price.getAddOnsAmount());
+            booking.setServiceFee(price.getServiceFee());
+            booking.setTotalAmount(price.getTotalAmount());
+            booking.setPrepaymentAmount(price.getPrepaymentAmount());
         }
 
         // Записать комментарий менеджера в историю (если есть)

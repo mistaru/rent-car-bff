@@ -6,6 +6,7 @@ import kg.founders.core.entity.rental.ServiceOption;
 import kg.founders.core.enums.AddOnType;
 import kg.founders.core.exceptions.BadRequestException;
 import kg.founders.core.exceptions.NotFoundException;
+import kg.founders.core.model.rental.AddOnRequest;
 import kg.founders.core.model.rental.ServiceOptionDto;
 import kg.founders.core.repo.BookingRepository;
 import kg.founders.core.repo.ServiceOptionRepository;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -149,10 +149,45 @@ public class ServiceOptionServiceImpl implements ServiceOptionService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public void validateInventoryAvailability(List<AddOnRequest> addOns, Long excludeBookingId) {
+        if (addOns == null || addOns.isEmpty()) return;
+
+        for (AddOnRequest req : addOns) {
+            int requestedQty = req.getEffectiveQuantity();
+            Optional<ServiceOption> optionOpt = repository.findByCode(req.getCode());
+            if (optionOpt.isEmpty()) continue;
+
+            ServiceOption option = optionOpt.get();
+            if (option.getTotalQuantity() == null) continue; // без лимита
+
+            long used;
+            try {
+                AddOnType addOnType = AddOnType.valueOf(req.getCode());
+                if (excludeBookingId != null) {
+                    used = bookingRepository.countActiveAddOnUsageExcluding(addOnType, LocalDate.now(), excludeBookingId);
+                } else {
+                    used = bookingRepository.countActiveAddOnUsage(addOnType, LocalDate.now());
+                }
+            } catch (IllegalArgumentException e) {
+                continue;
+            }
+
+            int available = Math.max(0, option.getTotalQuantity() - (int) used);
+            if (requestedQty > available) {
+                throw new BadRequestException(
+                        String.format("Недостаточно '%s': запрошено %d, доступно %d",
+                                option.getName(), requestedQty, available));
+            }
+        }
+        log.debug("Inventory validation passed for {} add-on(s)", addOns.size());
+    }
+
     @Override
     public List<String> getAddOnsNamesByBooking(Booking booking) {
         List<String> codes = booking.getAddOns().stream()
-                .map(addOn -> addOn.getAddOnType().name())
+                .map(addOn -> addOn.getAddOnType().name() + " count - " + addOn.getQuantity())
                 .toList();
 
         return repository.findByCodeIn(codes).stream()

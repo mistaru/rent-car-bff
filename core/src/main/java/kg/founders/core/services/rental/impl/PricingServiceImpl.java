@@ -7,6 +7,7 @@ import kg.founders.core.entity.rental.Vehicle;
 import kg.founders.core.enums.AddOnType;
 import kg.founders.core.exceptions.BadRequestException;
 import kg.founders.core.exceptions.NotFoundException;
+import kg.founders.core.model.rental.AddOnRequest;
 import kg.founders.core.model.rental.PriceBreakdown;
 import kg.founders.core.repo.PricingTemplateRepository;
 import kg.founders.core.repo.ServiceOptionRepository;
@@ -41,7 +42,7 @@ public class PricingServiceImpl implements PricingService {
      */
     @Transactional(readOnly = true)
     @Override
-    public PriceBreakdown calculateForVehicle(Long vehicleId, int days, List<AddOnType> addOns, String currency) {
+    public PriceBreakdown calculateForVehicle(Long vehicleId, int days, List<AddOnRequest> addOns, String currency) {
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new NotFoundException("Vehicle not found with id: " + vehicleId));
 
@@ -59,42 +60,27 @@ public class PricingServiceImpl implements PricingService {
             pricePerDay = vehicle.getPricePerDay();
         }
 
-        // Конвертируем AddOnType enum в коды строк для единой обработки
-        List<String> addOnCodes = null;
-        if (addOns != null) {
-            addOnCodes = new ArrayList<>();
-            for (AddOnType a : addOns) {
-                addOnCodes.add(a.name());
-            }
-        }
-
-        return calculateByCodes(pricePerDay, days, addOnCodes, currency != null ? currency : "USD", tierName);
+        return calculateByCodes(pricePerDay, days, addOns, currency != null ? currency : "USD", tierName);
     }
 
     /**
      * Базовый расчёт — совместимость со старым API (без vehicleId).
      */
     @Override
-    public PriceBreakdown calculate(BigDecimal pricePerDay, int days, List<AddOnType> addOns, String currency) {
-        List<String> codes = null;
-        if (addOns != null) {
-            codes = new ArrayList<>();
-            for (AddOnType a : addOns) {
-                codes.add(a.name());
-            }
-        }
-        return calculateByCodes(pricePerDay, days, codes, currency, null);
+    public PriceBreakdown calculate(BigDecimal pricePerDay, int days, List<AddOnRequest> addOns, String currency) {
+        return calculateByCodes(pricePerDay, days, addOns, currency, null);
     }
 
     /**
      * Полный расчёт стоимости с детализацией.
      * Цена доп. услуг берётся из таблицы service_options по коду.
      * Если не найдена — fallback на AddOnType enum (обратная совместимость).
+     * Количество учитывается через AddOnRequest.quantity.
      */
-    private PriceBreakdown calculateByCodes(BigDecimal pricePerDay, int days, List<String> addOnCodes,
+    private PriceBreakdown calculateByCodes(BigDecimal pricePerDay, int days, List<AddOnRequest> addOns,
                                             String currency, String tierName) {
-        log.debug("Calculating price: pricePerDay={}, days={}, addOnCodes={}, tier={}",
-                pricePerDay, days, addOnCodes, tierName);
+        log.debug("Calculating price: pricePerDay={}, days={}, addOns={}, tier={}",
+                pricePerDay, days, addOns, tierName);
 
         if (days < 1) {
             throw new BadRequestException("Rental period must be at least 1 day");
@@ -105,8 +91,10 @@ public class PricingServiceImpl implements PricingService {
         List<PriceBreakdown.AddOnPriceItem> addOnItems = new ArrayList<>();
         BigDecimal addOnsAmount = BigDecimal.ZERO;
 
-        if (addOnCodes != null) {
-            for (String code : addOnCodes) {
+        if (addOns != null) {
+            for (AddOnRequest req : addOns) {
+                String code = req.getCode();
+                int qty = req.getEffectiveQuantity();
                 BigDecimal addOnPricePerDay;
                 String displayName;
 
@@ -128,11 +116,14 @@ public class PricingServiceImpl implements PricingService {
                 }
 
                 BigDecimal addOnTotal = addOnPricePerDay
+                        .multiply(BigDecimal.valueOf(qty))
                         .multiply(BigDecimal.valueOf(days))
                         .setScale(2, RoundingMode.HALF_UP);
                 addOnItems.add(PriceBreakdown.AddOnPriceItem.builder()
                         .name(displayName)
+                        .code(code)
                         .pricePerDay(addOnPricePerDay)
+                        .quantity(qty)
                         .total(addOnTotal)
                         .build());
                 addOnsAmount = addOnsAmount.add(addOnTotal);

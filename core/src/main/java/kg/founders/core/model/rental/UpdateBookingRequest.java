@@ -3,6 +3,7 @@ package kg.founders.core.model.rental;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Запрос на обновление бронирования из админки.
@@ -29,5 +30,8 @@ public class UpdateBookingRequest {
 
     /** Комментарий менеджера (записывается в историю изменений) */
     private String managerComment;
+
+    /** Обновлённые доп. услуги (null = не менять, пустой список = удалить все) */
+    private List<AddOnRequest> addOns;
 }
 

@@ -32,6 +32,16 @@ public class BookingDto {
     private final String currency;
     private final String status;
     private final String paymentStatus;
-    private final List<String> addOns;
+    private final List<BookingAddOnDto> addOns;
     private final LocalDateTime createdAt;
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class BookingAddOnDto {
+        private final String code;
+        private final String name;
+        private final BigDecimal pricePerDay;
+        private final Integer quantity;
+    }
 }

@@ -52,12 +52,24 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     /**
      * Count how many active bookings currently use a given add-on (for inventory)
      */
-    @Query("SELECT COUNT(a) FROM BookingAddOn a " +
+    @Query("SELECT COALESCE(SUM(a.quantity), 0) FROM BookingAddOn a " +
             "WHERE a.addOnType = :addOnType " +
             "AND a.booking.status NOT IN (kg.founders.core.enums.BookingStatus.CANCELLED) " +
             "AND a.booking.dropoffDate >= :today")
     long countActiveAddOnUsage(@Param("addOnType") AddOnType addOnType,
                                @Param("today") LocalDate today);
+
+    /**
+     * Sum quantities of a given add-on in active bookings, excluding a specific booking (for update validation)
+     */
+    @Query("SELECT COALESCE(SUM(a.quantity), 0) FROM BookingAddOn a " +
+            "WHERE a.addOnType = :addOnType " +
+            "AND a.booking.id <> :excludeBookingId " +
+            "AND a.booking.status NOT IN (kg.founders.core.enums.BookingStatus.CANCELLED) " +
+            "AND a.booking.dropoffDate >= :today")
+    long countActiveAddOnUsageExcluding(@Param("addOnType") AddOnType addOnType,
+                                        @Param("today") LocalDate today,
+                                        @Param("excludeBookingId") Long excludeBookingId);
 
     @Query("""
                 SELECT b FROM Booking b

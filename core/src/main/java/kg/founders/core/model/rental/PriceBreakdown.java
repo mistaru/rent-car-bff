@@ -29,7 +29,9 @@ public class PriceBreakdown {
     @Builder
     public static class AddOnPriceItem {
         private final String name;
+        private final String code;
         private final BigDecimal pricePerDay;
+        private final int quantity;
         private final BigDecimal total;
     }
 }

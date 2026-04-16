@@ -1,11 +1,11 @@
 package kg.founders.core.model.rental;
 
-import kg.founders.core.enums.AddOnType;
 import kg.founders.core.enums.PaymentMethod;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -41,7 +42,7 @@ public class CreateBookingRequest {
     @NotNull(message = "Payment method is required")
     private PaymentMethod paymentMethod;
 
-    private List<AddOnType> addOns;
+    private List<AddOnRequest> addOns;
 
     private String currency;
 }

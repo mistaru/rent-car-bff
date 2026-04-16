@@ -46,7 +46,12 @@ public class BookingConverter extends ModelConverter<BookingDto, Booking> {
                 .paymentStatus(booking.getPaymentStatus().name())
                 .addOns(booking.getAddOns() != null
                         ? booking.getAddOns().stream()
-                        .map(a -> a.getAddOnType().name())
+                        .map(a -> BookingDto.BookingAddOnDto.builder()
+                                .code(a.getAddOnType().name())
+                                .name(a.getAddOnType().name().replace('_', ' '))
+                                .pricePerDay(a.getPricePerDay())
+                                .quantity(a.getQuantity())
+                                .build())
                         .collect(Collectors.toList())
                         : null)
                 .createdAt(booking.getCreatedAt())

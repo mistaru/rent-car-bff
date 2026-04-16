@@ -201,27 +201,27 @@ SELECT setval('bookings_id_seq', 8);
 -- =============================================
 -- 8. Booking Add-ons (12 штук)
 -- =============================================
-INSERT INTO booking_add_ons (id, booking_id, add_on_type, price_per_day) VALUES
-    -- Booking 1: ROOF_TENT($15) + SLEEPING_BAGS($5) × 4 дня = $80
-    (1,  1, 'ROOF_TENT',           15.00),
-    (2,  1, 'SLEEPING_BAGS',        5.00),
-    -- Booking 2: KITCHEN_UTENSILS($7) × 3 дня = $21
-    (3,  2, 'KITCHEN_UTENSILS',     7.00),
-    -- Booking 3: GROUND_TENT($10) + TABLE_AND_CHAIRS($6) × 5 дней = $80
-    (4,  3, 'GROUND_TENT',         10.00),
-    (5,  3, 'TABLE_AND_CHAIRS',     6.00),
-    -- Booking 4: BORDER_DOCUMENTS_KZ($20) × 4 дня = $80
-    (6,  4, 'BORDER_DOCUMENTS_KZ', 20.00),
-    -- Booking 5: REFRIGERATOR($8) × 3 дня = $24
-    (7,  5, 'REFRIGERATOR',         8.00),
-    -- Booking 6: ROOF_TENT($15) + KITCHEN_UTENSILS($7) × 6 дней = $132
-    (8,  6, 'ROOF_TENT',           15.00),
-    (9,  6, 'KITCHEN_UTENSILS',     7.00),
-    -- Booking 7: DELIVERY_AIRPORT($25) × 2 дня = $50
-    (10, 7, 'DELIVERY_AIRPORT',    25.00),
-    -- Booking 8: BORDER_DOCUMENTS_UZ($20) + DELIVERY_CITY($15) × 3 дня = $105
-    (11, 8, 'BORDER_DOCUMENTS_UZ', 20.00),
-    (12, 8, 'DELIVERY_CITY',       15.00);
+INSERT INTO booking_add_ons (id, booking_id, add_on_type, price_per_day, quantity) VALUES
+    -- Booking 1: ROOF_TENT($15) + SLEEPING_BAGS($5)×2 × 4 дня
+    (1,  1, 'ROOF_TENT',           15.00, 1),
+    (2,  1, 'SLEEPING_BAGS',        5.00, 2),
+    -- Booking 2: KITCHEN_UTENSILS($7) × 3 дня
+    (3,  2, 'KITCHEN_UTENSILS',     7.00, 1),
+    -- Booking 3: GROUND_TENT($10) + TABLE_AND_CHAIRS($6) × 5 дней
+    (4,  3, 'GROUND_TENT',         10.00, 1),
+    (5,  3, 'TABLE_AND_CHAIRS',     6.00, 1),
+    -- Booking 4: BORDER_DOCUMENTS_KZ($20) × 4 дня
+    (6,  4, 'BORDER_DOCUMENTS_KZ', 20.00, 1),
+    -- Booking 5: REFRIGERATOR($8) × 3 дня
+    (7,  5, 'REFRIGERATOR',         8.00, 1),
+    -- Booking 6: ROOF_TENT($15) + KITCHEN_UTENSILS($7) × 6 дней
+    (8,  6, 'ROOF_TENT',           15.00, 1),
+    (9,  6, 'KITCHEN_UTENSILS',     7.00, 1),
+    -- Booking 7: DELIVERY_AIRPORT($25) × 2 дня
+    (10, 7, 'DELIVERY_AIRPORT',    25.00, 1),
+    -- Booking 8: BORDER_DOCUMENTS_UZ($20) + DELIVERY_CITY($15) × 3 дня
+    (11, 8, 'BORDER_DOCUMENTS_UZ', 20.00, 1),
+    (12, 8, 'DELIVERY_CITY',       15.00, 1);
 
 SELECT setval('booking_add_ons_id_seq', 12);
 

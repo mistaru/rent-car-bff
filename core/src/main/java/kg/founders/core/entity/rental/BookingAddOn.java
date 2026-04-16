@@ -1,11 +1,7 @@
 package kg.founders.core.entity.rental;
 
 import kg.founders.core.enums.AddOnType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -33,4 +29,9 @@ public class BookingAddOn {
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal pricePerDay;
+
+    /** Количество единиц данной услуги */
+    @Column(nullable = false, columnDefinition = "integer default 1")
+    @Builder.Default
+    private Integer quantity = 1;
 }
