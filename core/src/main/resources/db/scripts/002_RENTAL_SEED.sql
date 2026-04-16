@@ -154,47 +154,47 @@ INSERT INTO bookings (id, vehicle_id, customer_id, pickup_location_id, dropoff_l
                       pickup_date, dropoff_date, days, price_per_day, price_tier_description,
                       base_amount, add_ons_amount, service_fee, total_amount,
                       prepayment_amount, prepayment_paid,
-                      service_block_start, service_block_end,
-                      currency, status, payment_status, created_at, version) VALUES
+                      currency, status, payment_status, created_at, version)
+VALUES
     -- 1: Mercedes S-Class, confirmed+paid, past
-    (1, 3,  1, 2, 2, '2026-02-10', '2026-02-14', 4, 320.00, 'Тариф 1–3 дня',
+    (1, 3, 1, 2, 2, '2026-02-10', '2026-02-14', 4, 320.00, 'Тариф 1–3 дня',
      1280.00, 80.00, 136.00, 1496.00, 224.40, TRUE,
-     '2026-02-09', '2026-02-15', 'USD', 'CONFIRMED', 'PAID', '2026-02-05 10:30:00', 0),
+     'USD', 'CONFIRMED', 'PAID', '2026-02-05 10:30:00', 0),
 
     -- 2: BMW X5, confirmed+paid, past
-    (2, 2,  2, 1, 1, '2026-02-20', '2026-02-23', 3, 150.00, 'Тариф 1–3 дня',
+    (2, 2, 2, 1, 1, '2026-02-20', '2026-02-23', 3, 150.00, 'Тариф 1–3 дня',
      450.00, 21.00, 47.10, 518.10, 77.72, TRUE,
-     '2026-02-19', '2026-02-24', 'USD', 'CONFIRMED', 'PAID', '2026-02-15 14:20:00', 0),
+     'USD', 'CONFIRMED', 'PAID', '2026-02-15 14:20:00', 0),
 
     -- 3: Land Cruiser, confirmed+paid, upcoming
-    (3, 7,  3, 4, 3, '2026-03-15', '2026-03-20', 5, 320.00, 'Тариф 4–7 дней',
+    (3, 7, 3, 4, 3, '2026-03-15', '2026-03-20', 5, 320.00, 'Тариф 4–7 дней',
      1600.00, 80.00, 168.00, 1848.00, 277.20, TRUE,
-     '2026-03-14', '2026-03-21', 'USD', 'CONFIRMED', 'PAID', '2026-03-01 09:00:00', 0),
+     'USD', 'CONFIRMED', 'PAID', '2026-03-01 09:00:00', 0),
 
     -- 4: Porsche Cayenne, pending payment
     (4, 11, 4, 2, 2, '2026-03-18', '2026-03-22', 4, 380.00, 'Тариф 1–3 дня',
      1520.00, 80.00, 160.00, 1760.00, 264.00, FALSE,
-     '2026-03-17', '2026-03-23', 'USD', 'PENDING_PAYMENT', 'UNPAID', '2026-03-02 16:45:00', 0),
+     'USD', 'PENDING_PAYMENT', 'UNPAID', '2026-03-02 16:45:00', 0),
 
     -- 5: Toyota Camry, cancelled
-    (5, 1,  5, 1, 2, '2026-03-05', '2026-03-08', 3, 75.00, 'Тариф 1–3 дня',
+    (5, 1, 5, 1, 2, '2026-03-05', '2026-03-08', 3, 75.00, 'Тариф 1–3 дня',
      225.00, 24.00, 24.90, 273.90, 41.09, FALSE,
-     '2026-03-04', '2026-03-09', 'USD', 'CANCELLED', 'UNPAID', '2026-02-28 11:15:00', 0),
+     'USD', 'CANCELLED', 'UNPAID', '2026-02-28 11:15:00', 0),
 
     -- 6: Range Rover Sport, confirmed+paid, future
     (6, 13, 9, 1, 1, '2026-04-01', '2026-04-07', 6, 320.00, 'Тариф 4–7 дней',
      1920.00, 132.00, 205.20, 2257.20, 338.58, TRUE,
-     '2026-03-31', '2026-04-08', 'USD', 'CONFIRMED', 'PAID', '2026-03-01 08:00:00', 0),
+     'USD', 'CONFIRMED', 'PAID', '2026-03-01 08:00:00', 0),
 
     -- 7: Toyota Corolla, confirmed+paid (on delivery)
     (7, 20, 6, 2, 2, '2026-03-10', '2026-03-12', 2, 45.00, 'Тариф 1–3 дня',
      90.00, 50.00, 14.00, 154.00, 23.10, TRUE,
-     '2026-03-09', '2026-03-13', 'USD', 'CONFIRMED', 'PAID', '2026-03-03 12:00:00', 0),
+     'USD', 'CONFIRMED', 'PAID', '2026-03-03 12:00:00', 0),
 
     -- 8: Ford Mustang, pending payment
     (8, 19, 10, 1, 1, '2026-03-25', '2026-03-28', 3, 350.00, 'Тариф 1–3 дня',
      1050.00, 105.00, 115.50, 1270.50, 190.58, FALSE,
-     '2026-03-24', '2026-03-29', 'USD', 'PENDING_PAYMENT', 'UNPAID', '2026-03-03 15:30:00', 0);
+     'USD', 'PENDING_PAYMENT', 'UNPAID', '2026-03-03 15:30:00', 0);
 
 SELECT setval('bookings_id_seq', 8);
 

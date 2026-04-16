@@ -2,6 +2,7 @@ package kg.founders.core.services.rental.impl;
 
 import kg.founders.core.entity.rental.Booking;
 import kg.founders.core.services.rental.BookingEmailService;
+import kg.founders.core.services.rental.ServiceOptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,8 @@ public class BookingEmailServiceImpl implements BookingEmailService {
 
     private static final DateTimeFormatter DATE_FMT =
             DateTimeFormatter.ofPattern("MMMM d, yyyy");
+
+    private final ServiceOptionService serviceOptionService;
 
     @Async
     public void sendBookingConfirmation(Booking booking) {
@@ -64,10 +67,9 @@ public class BookingEmailServiceImpl implements BookingEmailService {
     }
 
     private String buildCustomerEmailBody(Booking booking) {
-        String pickupDate  = booking.getPickupDate().format(DATE_FMT);
-        String dropoffDate = booking.getDropoffDate().format(DATE_FMT);
-//        String addOns      = formatAddOns(booking.getAddOns());
-        String addOns      = "SOME ADD-ONS"; // TODO: add actual add-ons when they are implemented
+        String pickupDate  = booking.getPickupDate().plusDays(1).format(DATE_FMT);
+        String dropoffDate = booking.getDropoffDate().minusDays(1).format(DATE_FMT);
+        String addOns      = formatAddOns(serviceOptionService.getAddOnsNamesByBooking(booking));
         int    days        = booking.getDays() != null ? booking.getDays() :
                 (int)(booking.getDropoffDate().toEpochDay() - booking.getPickupDate().toEpochDay());
 
@@ -104,8 +106,7 @@ public class BookingEmailServiceImpl implements BookingEmailService {
     private String buildAdminEmailBody(Booking booking) {
         String pickupDate  = booking.getPickupDate().format(DATE_FMT);
         String dropoffDate = booking.getDropoffDate().format(DATE_FMT);
-//        String addOns      = formatAddOns(booking.getAddOns());
-        String addOns      = "SOME ADD-ONS"; // TODO: add actual add-ons when they are implemented
+        String addOns      = formatAddOns(serviceOptionService.getAddOnsNamesByBooking(booking));
 
         return String.format("""
             New booking request received.

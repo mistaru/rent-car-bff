@@ -12,6 +12,8 @@ public interface ServiceOptionRepository extends JpaRepository<ServiceOption, Lo
 
     Optional<ServiceOption> findByCode(String code);
 
+    List<ServiceOption> findByCodeIn(List<String> codes);
+
     List<ServiceOption> findByActiveTrueOrderBySortOrderAscNameAsc();
 
     List<ServiceOption> findAllByOrderBySortOrderAscNameAsc();

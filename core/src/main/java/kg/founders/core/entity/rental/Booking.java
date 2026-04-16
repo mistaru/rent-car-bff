@@ -83,14 +83,6 @@ public class Booking {
     @Builder.Default
     private Boolean prepaymentPaid = false;
 
-    /** Сервисный день блокировки ДО начала аренды */
-    @Column(name = "service_block_start")
-    private LocalDate serviceBlockStart;
-
-    /** Сервисный день блокировки ПОСЛЕ окончания аренды */
-    @Column(name = "service_block_end")
-    private LocalDate serviceBlockEnd;
-
     @Column(nullable = false, length = 3)
     @Builder.Default
     private String currency = "USD";

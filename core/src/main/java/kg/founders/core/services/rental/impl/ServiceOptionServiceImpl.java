@@ -1,5 +1,7 @@
 package kg.founders.core.services.rental.impl;
 
+import kg.founders.core.entity.rental.Booking;
+import kg.founders.core.entity.rental.BookingAddOn;
 import kg.founders.core.entity.rental.ServiceOption;
 import kg.founders.core.enums.AddOnType;
 import kg.founders.core.exceptions.BadRequestException;
@@ -14,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -143,6 +147,17 @@ public class ServiceOptionServiceImpl implements ServiceOptionService {
                 .sortOrder(dto.getSortOrder() != null ? dto.getSortOrder() : 0)
                 .totalQuantity(dto.getTotalQuantity())
                 .build();
+    }
+
+    @Override
+    public List<String> getAddOnsNamesByBooking(Booking booking) {
+        List<String> codes = booking.getAddOns().stream()
+                .map(addOn -> addOn.getAddOnType().name())
+                .toList();
+
+        return repository.findByCodeIn(codes).stream()
+                .map(ServiceOption::getName)
+                .toList();
     }
 }
 

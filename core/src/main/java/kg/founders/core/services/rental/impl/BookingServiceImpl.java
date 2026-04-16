@@ -29,13 +29,13 @@ public class BookingServiceImpl implements BookingService {
     private final VehicleRepository vehicleRepository;
     private final CustomerRepository customerRepository;
     private final LocationRepository locationRepository;
-    private final ServiceOptionRepository serviceOptionRepository;
     private final AvailabilityService availabilityService;
     private final PricingService pricingService;
     private final PaymentService paymentService;
     private final ApplicationEventPublisher eventPublisher;
     private final BookingHistoryService bookingHistoryService;
     private final BookingEmailService bookingEmailService;
+    private final ServiceOptionService serviceOptionService;
     private final BookingConverter bookingConverter;
 
     @Transactional
@@ -81,18 +81,14 @@ public class BookingServiceImpl implements BookingService {
         PriceBreakdown price = pricingService.calculateForVehicle(
                 vehicle.getId(), days, request.getAddOns(), currency);
 
-        // 5. Service block: +1 day before and after for maintenance
-        LocalDate serviceBlockStart = request.getPickupDate().minusDays(1);
-        LocalDate serviceBlockEnd = request.getDropoffDate().plusDays(1);
-
-        // 6. Build booking with fixed pricing
+        // 5. Build booking with fixed pricing
         Booking booking = Booking.builder()
                 .vehicle(vehicle)
                 .customer(customer)
                 .pickupLocation(pickupLocation)
                 .dropoffLocation(dropoffLocation)
-                .pickupDate(request.getPickupDate())
-                .dropoffDate(request.getDropoffDate())
+                .pickupDate(request.getPickupDate().minusDays(1)) //Service block: +1 day before for maintenance
+                .dropoffDate(request.getDropoffDate().plusDays(1)) //Service block: +1 day after for maintenance
                 .days(days)
                 .pricePerDay(price.getPricePerDay())
                 .priceTierDescription(price.getTierName())
@@ -102,15 +98,13 @@ public class BookingServiceImpl implements BookingService {
                 .totalAmount(price.getTotalAmount())
                 .prepaymentAmount(price.getPrepaymentAmount())
                 .prepaymentPaid(false)
-                .serviceBlockStart(serviceBlockStart)
-                .serviceBlockEnd(serviceBlockEnd)
                 .currency(currency)
                 .status(BookingStatus.PENDING_PAYMENT)
                 .paymentStatus(PaymentStatus.UNPAID)
                 .addOns(new ArrayList<>())
                 .build();
 
-        // 7. Add add-ons
+        // 6. Add add-ons
         if (request.getAddOns() != null) {
             for (AddOnType addOnType : request.getAddOns()) {
                 BookingAddOn addOn = BookingAddOn.builder()
@@ -246,12 +240,10 @@ public class BookingServiceImpl implements BookingService {
             String oldDates = booking.getPickupDate() + " → " + booking.getDropoffDate();
             String newDates = newPickup + " → " + newDropoff;
 
-            booking.setPickupDate(newPickup);
-            booking.setDropoffDate(newDropoff);
+            booking.setPickupDate(newPickup.minusDays(1)); //Service block: +1 day before for maintenance
+            booking.setDropoffDate(newDropoff.plusDays(1)); //Service block: +1 day after for maintenance
             int days = (int) ChronoUnit.DAYS.between(newPickup, newDropoff);
             booking.setDays(days);
-            booking.setServiceBlockStart(newPickup.minusDays(1));
-            booking.setServiceBlockEnd(newDropoff.plusDays(1));
 
             // Пересчёт стоимости
             PriceBreakdown price = pricingService.calculateForVehicle(
@@ -385,13 +377,6 @@ public class BookingServiceImpl implements BookingService {
                     .bookings(new ArrayList<>())
                     .build());
 
-            List<String> addOnNames = new ArrayList<>();
-
-            for (BookingAddOn addOn : booking.getAddOns()) {
-                Optional<ServiceOption> serviceOption = serviceOptionRepository.findByCode(addOn.getAddOnType().name());
-                serviceOption.ifPresent(option -> addOnNames.add(option.getName()));
-            }
-
             row.getBookings().add(BookingBarDto.builder()
                     .id(booking.getId())
                     .customerName(booking.getCustomer().getFullName())
@@ -399,7 +384,7 @@ public class BookingServiceImpl implements BookingService {
                     .pickupDate(booking.getPickupDate().toString())
                     .dropoffDate(booking.getDropoffDate().toString())
                     .totalAmount(booking.getTotalAmount())
-                    .addOns(addOnNames)
+                    .addOns(serviceOptionService.getAddOnsNamesByBooking(booking))
                     .status(booking.getStatus().name())
                     .paymentStatus(booking.getPaymentStatus().name())
                     .build());

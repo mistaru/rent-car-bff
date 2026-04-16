@@ -1,5 +1,6 @@
 package kg.founders.core.services.rental;
 
+import kg.founders.core.entity.rental.Booking;
 import kg.founders.core.model.rental.ServiceOptionDto;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,4 +24,6 @@ public interface ServiceOptionService {
 
     @Transactional
     void delete(Long id);
+
+    List<String> getAddOnsNamesByBooking(Booking booking);
 }
