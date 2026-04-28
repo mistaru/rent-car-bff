@@ -125,23 +125,23 @@ public class BookingServiceImpl implements BookingService {
             }
         }
 
-        // 8. Set vehicle to RESERVED
-        vehicle.setStatus(VehicleStatus.RESERVED);
-        vehicleRepository.save(vehicle);
+        // ### Set vehicle to RESERVED TODO CARD-33 - what to do if customer doesn't pay? We can't keep it reserved forever
+//        vehicle.setStatus(VehicleStatus.RESERVED);
+//        vehicleRepository.save(vehicle);
 
-        // 9. Save booking
+        // 7. Save booking
         booking = bookingRepository.save(booking);
         log.info("Booking created with id: {}, prepayment: {}",
                 booking.getId(), price.getPrepaymentAmount());
 
-        // 10. Send confirmation email
+        // 8. Send confirmation email
         bookingEmailService.sendBookingConfirmation(booking);
 
-        // 11. Publish event
+        // 9. Publish event
         eventPublisher.publishEvent(
                 new BookingCreatedEvent(this, booking.getId(), vehicle.getId(), customer.getId()));
 
-        // 12. Audit log
+        // 10. Audit log
         bookingHistoryService.logCreated(booking, "system");
 
         return bookingConverter.convertFromEntity(booking);

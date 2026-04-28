@@ -50,7 +50,7 @@ public class BookingController {
     @ManualPermissionControl
     @PutMapping("/{id}")
     public ResponseEntity<BookingDto> updateBooking(@PathVariable Long id,
-                                                     @RequestBody UpdateBookingRequest request) {
+                                                    @RequestBody UpdateBookingRequest request) {
         return ResponseEntity.ok(bookingService.updateBooking(id, request));
     }
 
