@@ -1,7 +1,10 @@
 package kg.founders.bff.controller.rental;
 
+import kg.founders.core.enums.AuditAction;
 import kg.founders.core.model.rental.VehicleAttributeDto;
 import kg.founders.core.services.rental.VehicleAttributeService;
+import kg.founders.core.settings.audit.Auditable;
+import kg.founders.core.settings.audit.AuditEntityId;
 import kg.founders.core.settings.security.permission.annotation.ManualPermissionControl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,20 +37,23 @@ public class VehicleAttributeController {
     }
 
     @ManualPermissionControl
+    @Auditable(entity = "VEHICLE_ATTRIBUTE", action = AuditAction.CREATE)
     @PostMapping
     public ResponseEntity<VehicleAttributeDto> create(@RequestBody VehicleAttributeDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createAttribute(dto));
     }
 
     @ManualPermissionControl
+    @Auditable(entity = "VEHICLE_ATTRIBUTE", action = AuditAction.UPDATE)
     @PutMapping("/{id}")
-    public ResponseEntity<VehicleAttributeDto> update(@PathVariable Long id, @RequestBody VehicleAttributeDto dto) {
+    public ResponseEntity<VehicleAttributeDto> update(@AuditEntityId @PathVariable Long id, @RequestBody VehicleAttributeDto dto) {
         return ResponseEntity.ok(service.updateAttribute(id, dto));
     }
 
     @ManualPermissionControl
+    @Auditable(entity = "VEHICLE_ATTRIBUTE", action = AuditAction.DELETE)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@AuditEntityId @PathVariable Long id) {
         service.deleteAttribute(id);
         return ResponseEntity.noContent().build();
     }
@@ -72,8 +78,9 @@ public class VehicleAttributeController {
 
     /** Установить значения атрибутов для авто (bulk) */
     @ManualPermissionControl
+    @Auditable(entity = "VEHICLE_ATTRIBUTE", action = AuditAction.UPDATE)
     @PutMapping("/vehicle/{vehicleId}")
-    public ResponseEntity<Void> setVehicleValues(@PathVariable Long vehicleId,
+    public ResponseEntity<Void> setVehicleValues(@AuditEntityId @PathVariable Long vehicleId,
                                                    @RequestBody Map<String, String> attributes) {
         service.setVehicleAttributes(vehicleId, attributes);
         return ResponseEntity.ok().build();

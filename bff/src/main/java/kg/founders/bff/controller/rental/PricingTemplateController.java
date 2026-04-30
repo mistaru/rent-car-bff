@@ -1,8 +1,11 @@
 package kg.founders.bff.controller.rental;
 
+import kg.founders.core.enums.AuditAction;
 import kg.founders.core.model.rental.CreatePricingTemplateRequest;
 import kg.founders.core.model.rental.PricingTemplateDto;
 import kg.founders.core.services.rental.impl.PricingTemplateServiceImpl;
+import kg.founders.core.settings.audit.Auditable;
+import kg.founders.core.settings.audit.AuditEntityId;
 import kg.founders.core.settings.security.permission.annotation.ManualPermissionControl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,6 +45,7 @@ public class PricingTemplateController {
 
     /** Создать новый шаблон тарифов */
     @ManualPermissionControl
+    @Auditable(entity = "PRICING_TEMPLATE", action = AuditAction.CREATE)
     @PostMapping
     public ResponseEntity<PricingTemplateDto> createTemplate(
             @Valid @RequestBody CreatePricingTemplateRequest request) {
@@ -50,25 +54,28 @@ public class PricingTemplateController {
 
     /** Обновить шаблон тарифов */
     @ManualPermissionControl
+    @Auditable(entity = "PRICING_TEMPLATE", action = AuditAction.UPDATE)
     @PutMapping("/{id}")
     public ResponseEntity<PricingTemplateDto> updateTemplate(
-            @PathVariable Long id,
+            @AuditEntityId @PathVariable Long id,
             @Valid @RequestBody CreatePricingTemplateRequest request) {
         return ResponseEntity.ok(templateService.updateTemplate(id, request));
     }
 
     /** Удалить шаблон (только если не привязан к машинам) */
     @ManualPermissionControl
+    @Auditable(entity = "PRICING_TEMPLATE", action = AuditAction.DELETE)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTemplate(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTemplate(@AuditEntityId @PathVariable Long id) {
         templateService.deleteTemplate(id);
         return ResponseEntity.noContent().build();
     }
 
     /** Включить/отключить шаблон */
     @ManualPermissionControl
+    @Auditable(entity = "PRICING_TEMPLATE", action = AuditAction.STATUS_CHANGE)
     @PostMapping("/{id}/toggle-active")
-    public ResponseEntity<PricingTemplateDto> toggleActive(@PathVariable Long id) {
+    public ResponseEntity<PricingTemplateDto> toggleActive(@AuditEntityId @PathVariable Long id) {
         return ResponseEntity.ok(templateService.toggleActive(id));
     }
 

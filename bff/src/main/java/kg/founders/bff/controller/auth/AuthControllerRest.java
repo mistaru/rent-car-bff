@@ -7,8 +7,11 @@ import kg.founders.bff.config.response.ResultCode;
 import kg.founders.bff.config.settings.TokenContextHolder;
 import kg.founders.bff.config.settings.perms.PermissionValidation;
 import kg.founders.core.entity.auth.Auth;
+import kg.founders.core.enums.AuditAction;
 import kg.founders.core.enums.permission.AccessType;
 import kg.founders.core.enums.permission.PermissionType;
+import kg.founders.core.settings.audit.Auditable;
+import kg.founders.core.settings.audit.AuditEntityId;
 import kg.founders.core.exceptions.ForbiddenException;
 import kg.founders.core.exceptions.UserNotFoundException;
 import kg.founders.core.model.audit.AuditModel;
@@ -109,6 +112,7 @@ public class AuthControllerRest {
     @PostMapping(value = "/auth")
     @HasPermission(PermissionType.AUTH)
     @HasAccess({AccessType.CREATE, AccessType.UPDATE})
+    @Auditable(entity = "AUTH_USER", action = AuditAction.CREATE)
     public ResponseMessage<String> create(@RequestBody AuthModel model) {
         try {
             PermissionValidation.validateCreateUpdate(model);
@@ -123,7 +127,8 @@ public class AuthControllerRest {
     @DeleteMapping(value = "/auth")
     @HasPermission(PermissionType.AUTH)
     @HasAccess({AccessType.DELETE})
-    public ResponseMessage<String> delete(@RequestParam Long authId) {
+    @Auditable(entity = "AUTH_USER", action = AuditAction.DELETE)
+    public ResponseMessage<String> delete(@AuditEntityId @RequestParam Long authId) {
         try {
             authService.deleteByAuthId(authId);
             return new ResponseMessage<>("Пользователь успешно удален", ResultCode.OK);
@@ -136,7 +141,8 @@ public class AuthControllerRest {
     @PostMapping(value = "/auth/block")
     @HasPermission(PermissionType.AUTH)
     @HasAccess({AccessType.UPDATE})
-    public ResponseMessage<String> block(@RequestParam Long authId, @RequestParam boolean block) {
+    @Auditable(entity = "AUTH_USER", action = AuditAction.STATUS_CHANGE)
+    public ResponseMessage<String> block(@AuditEntityId @RequestParam Long authId, @RequestParam boolean block) {
         try {
             authService.blockAuth(authId, block);
             return new ResponseMessage<>("Пользователь успешно заблокирован", ResultCode.OK);

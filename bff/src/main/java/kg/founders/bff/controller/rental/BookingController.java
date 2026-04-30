@@ -1,8 +1,11 @@
 package kg.founders.bff.controller.rental;
 
+import kg.founders.core.enums.AuditAction;
 import kg.founders.core.model.rental.*;
 import kg.founders.core.services.rental.BookingService;
 import kg.founders.core.services.rental.impl.BookingHistoryServiceImpl;
+import kg.founders.core.settings.audit.Auditable;
+import kg.founders.core.settings.audit.AuditEntityId;
 import kg.founders.core.settings.security.permission.annotation.ManualPermissionControl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,6 +26,7 @@ public class BookingController {
     private final BookingHistoryServiceImpl bookingHistoryService;
 
     @ManualPermissionControl
+    @Auditable(entity = "BOOKING", action = AuditAction.CREATE)
     @PostMapping
     public ResponseEntity<BookingDto> createBooking(@Valid @RequestBody CreateBookingRequest request) {
         BookingDto booking = bookingService.createBooking(request);
@@ -48,15 +52,17 @@ public class BookingController {
     }
 
     @ManualPermissionControl
+    @Auditable(entity = "BOOKING", action = AuditAction.UPDATE)
     @PutMapping("/{id}")
-    public ResponseEntity<BookingDto> updateBooking(@PathVariable Long id,
+    public ResponseEntity<BookingDto> updateBooking(@AuditEntityId @PathVariable Long id,
                                                     @RequestBody UpdateBookingRequest request) {
         return ResponseEntity.ok(bookingService.updateBooking(id, request));
     }
 
     @ManualPermissionControl
+    @Auditable(entity = "BOOKING", action = AuditAction.CANCEL)
     @PostMapping("/{id}/cancel")
-    public ResponseEntity<BookingDto> cancelBooking(@PathVariable Long id) {
+    public ResponseEntity<BookingDto> cancelBooking(@AuditEntityId @PathVariable Long id) {
         return ResponseEntity.ok(bookingService.cancelBooking(id));
     }
 

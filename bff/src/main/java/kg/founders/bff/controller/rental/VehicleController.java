@@ -1,6 +1,9 @@
 package kg.founders.bff.controller.rental;
 
+import kg.founders.core.enums.AuditAction;
 import kg.founders.core.model.rental.VehicleDto;
+import kg.founders.core.settings.audit.Auditable;
+import kg.founders.core.settings.audit.AuditEntityId;
 import kg.founders.core.model.rental.VehicleSearchRequest;
 import kg.founders.core.services.rental.AvailabilityService;
 import kg.founders.core.services.rental.VehicleService;
@@ -121,20 +124,23 @@ public class VehicleController {
     }
 
     @ManualPermissionControl
+    @Auditable(entity = "VEHICLE", action = AuditAction.CREATE)
     @PostMapping
     public ResponseEntity<VehicleDto> createVehicle(@RequestBody VehicleDto dto) {
         return ResponseEntity.ok(vehicleService.createVehicle(dto));
     }
 
     @ManualPermissionControl
+    @Auditable(entity = "VEHICLE", action = AuditAction.UPDATE)
     @PutMapping("/{id}")
-    public ResponseEntity<VehicleDto> updateVehicle(@PathVariable Long id, @RequestBody VehicleDto dto) {
+    public ResponseEntity<VehicleDto> updateVehicle(@AuditEntityId @PathVariable Long id, @RequestBody VehicleDto dto) {
         return ResponseEntity.ok(vehicleService.updateVehicle(id, dto));
     }
 
     @ManualPermissionControl
+    @Auditable(entity = "VEHICLE", action = AuditAction.DELETE)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVehicle(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteVehicle(@AuditEntityId @PathVariable Long id) {
         vehicleService.deleteVehicle(id);
         return ResponseEntity.noContent().build();
     }

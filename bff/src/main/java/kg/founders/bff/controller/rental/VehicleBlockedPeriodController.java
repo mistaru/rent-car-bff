@@ -1,8 +1,11 @@
 package kg.founders.bff.controller.rental;
 
+import kg.founders.core.enums.AuditAction;
 import kg.founders.core.model.rental.CreateBlockedPeriodRequest;
 import kg.founders.core.model.rental.VehicleBlockedPeriodDto;
 import kg.founders.core.services.rental.VehicleBlockedPeriodService;
+import kg.founders.core.settings.audit.Auditable;
+import kg.founders.core.settings.audit.AuditEntityId;
 import kg.founders.core.settings.security.permission.annotation.ManualPermissionControl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,21 +35,24 @@ public class VehicleBlockedPeriodController {
     }
 
     @ManualPermissionControl
+    @Auditable(entity = "VEHICLE_BLOCKED_PERIOD", action = AuditAction.BLOCK)
     @PostMapping
     public ResponseEntity<VehicleBlockedPeriodDto> create(@Valid @RequestBody CreateBlockedPeriodRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
     }
 
     @ManualPermissionControl
+    @Auditable(entity = "VEHICLE_BLOCKED_PERIOD", action = AuditAction.UPDATE)
     @PutMapping("/{id}")
-    public ResponseEntity<VehicleBlockedPeriodDto> update(@PathVariable Long id,
+    public ResponseEntity<VehicleBlockedPeriodDto> update(@AuditEntityId @PathVariable Long id,
                                                            @Valid @RequestBody CreateBlockedPeriodRequest request) {
         return ResponseEntity.ok(service.update(id, request));
     }
 
     @ManualPermissionControl
+    @Auditable(entity = "VEHICLE_BLOCKED_PERIOD", action = AuditAction.UNBLOCK)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@AuditEntityId @PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
