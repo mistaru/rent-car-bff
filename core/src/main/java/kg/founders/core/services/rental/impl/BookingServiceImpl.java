@@ -134,14 +134,17 @@ public class BookingServiceImpl implements BookingService {
         log.info("Booking created with id: {}, prepayment: {}",
                 booking.getId(), price.getPrepaymentAmount());
 
-        // 8. Send confirmation email
+        // 8. Create prepayment
+        paymentService.initiatePrepayment(booking.getId());
+
+        // 9. Send confirmation email
         bookingEmailService.sendBookingConfirmation(booking);
 
-        // 9. Publish event
+        // 10. Publish event
         eventPublisher.publishEvent(
                 new BookingCreatedEvent(this, booking.getId(), vehicle.getId(), customer.getId()));
 
-        // 10. Audit log
+        // 11. Audit log
         bookingHistoryService.logCreated(booking, "system");
 
         return bookingConverter.convertFromEntity(booking);

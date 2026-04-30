@@ -1,6 +1,7 @@
 package kg.founders.bff.controller.rental;
 
 import kg.founders.core.enums.AuditAction;
+import kg.founders.core.model.rental.InitiatePaymentRequest;
 import kg.founders.core.model.rental.PaymentDto;
 import kg.founders.core.model.rental.ProcessPaymentRequest;
 import kg.founders.core.services.rental.PaymentService;
@@ -31,8 +32,9 @@ public class PaymentController {
     @ManualPermissionControl
     @Auditable(entity = "PAYMENT", action = AuditAction.CREATE)
     @PostMapping("/initiate/{bookingId}")
-    public ResponseEntity<PaymentDto> initiatePayment(@AuditEntityId @PathVariable Long bookingId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.initiatePayment(bookingId));
+    public ResponseEntity<PaymentDto> initiatePayment(@AuditEntityId @PathVariable Long bookingId,
+                                                      @Valid @RequestBody InitiatePaymentRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.initiatePayment(bookingId, request.getAmount()));
     }
 
     @ManualPermissionControl

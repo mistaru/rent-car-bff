@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final BookingHistoryServiceImpl bookingHistoryService;
     private final PaymentConverter paymentConverter;
 
+    // private final double PREPAYMENT_PERCENTAGE = 0.01;
+
     @Transactional(readOnly = true)
     @Override
     public List<PaymentDto> getAllPayments() {
@@ -42,7 +45,35 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Transactional
     @Override
-    public PaymentDto initiatePayment(Long bookingId) {
+    public PaymentDto initiatePrepayment(Long bookingId) {
+        Booking booking = bookingRepository.findByIdWithDetails(bookingId)
+                .orElseThrow(() -> new NotFoundException("Booking not found with id: " + bookingId));
+
+        if (booking.getStatus() != BookingStatus.PENDING_PAYMENT) {
+            throw new PaymentFailedException("Booking is not in PENDING_PAYMENT status. Current status: " + booking.getStatus());
+        }
+
+        // BigDecimal prepaymentAmount = booking.getTotalAmount().multiply(BigDecimal.valueOf(PREPAYMENT_PERCENTAGE));
+
+        Payment payment = Payment.builder()
+                .booking(booking)
+                .method(PaymentMethod.ONLINE)
+                .status(PaymentTransactionStatus.INITIATED)
+                .amount(booking.getPrepaymentAmount())
+                .build();
+
+        payment = paymentRepository.save(payment);
+        log.info("Payment initiated for booking {}, payment id: {}", bookingId, payment.getId());
+
+        bookingHistoryService.logFieldChange(booking, "PAYMENT_INITIATED", "paymentId",
+                null, String.valueOf(payment.getId()), "system");
+
+        return paymentConverter.convertFromEntity(payment);
+    }
+
+    @Transactional
+    @Override
+    public PaymentDto initiatePayment(Long bookingId, BigDecimal amount) {
         Booking booking = bookingRepository.findByIdWithDetails(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking not found with id: " + bookingId));
 
@@ -54,7 +85,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .booking(booking)
                 .method(PaymentMethod.ONLINE)
                 .status(PaymentTransactionStatus.INITIATED)
-                .amount(booking.getTotalAmount())
+                .amount(amount)
                 .build();
 
         payment = paymentRepository.save(payment);
