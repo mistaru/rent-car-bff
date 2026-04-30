@@ -1,5 +1,6 @@
 package kg.founders.core.model.rental;
 
+import kg.founders.core.enums.PricingType;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -17,6 +18,7 @@ public class ServiceOptionDto {
     private String category;
     private String icon;
     private BigDecimal pricePerDay;
+    private PricingType pricingType;
     private Boolean active;
     private Integer sortOrder;
 

@@ -4,6 +4,7 @@ import kg.founders.core.entity.rental.Booking;
 import kg.founders.core.entity.rental.BookingAddOn;
 import kg.founders.core.entity.rental.ServiceOption;
 import kg.founders.core.enums.AddOnType;
+import kg.founders.core.enums.PricingType;
 import kg.founders.core.exceptions.BadRequestException;
 import kg.founders.core.exceptions.NotFoundException;
 import kg.founders.core.model.rental.AddOnRequest;
@@ -83,6 +84,7 @@ public class ServiceOptionServiceImpl implements ServiceOptionService {
         entity.setCategory(dto.getCategory());
         entity.setIcon(dto.getIcon());
         entity.setPricePerDay(dto.getPricePerDay());
+        entity.setPricingType(dto.getPricingType() != null ? dto.getPricingType() : PricingType.PER_DAY);
         entity.setActive(dto.getActive() != null ? dto.getActive() : true);
         entity.setSortOrder(dto.getSortOrder() != null ? dto.getSortOrder() : 0);
         entity.setTotalQuantity(dto.getTotalQuantity());
@@ -111,6 +113,7 @@ public class ServiceOptionServiceImpl implements ServiceOptionService {
                 .category(e.getCategory())
                 .icon(e.getIcon())
                 .pricePerDay(e.getPricePerDay())
+                .pricingType(e.getPricingType() != null ? e.getPricingType() : PricingType.PER_DAY)
                 .active(e.getActive())
                 .sortOrder(e.getSortOrder())
                 .totalQuantity(e.getTotalQuantity())
@@ -143,6 +146,7 @@ public class ServiceOptionServiceImpl implements ServiceOptionService {
                 .category(dto.getCategory())
                 .icon(dto.getIcon())
                 .pricePerDay(dto.getPricePerDay())
+                .pricingType(dto.getPricingType() != null ? dto.getPricingType() : PricingType.PER_DAY)
                 .active(dto.getActive() != null ? dto.getActive() : true)
                 .sortOrder(dto.getSortOrder() != null ? dto.getSortOrder() : 0)
                 .totalQuantity(dto.getTotalQuantity())

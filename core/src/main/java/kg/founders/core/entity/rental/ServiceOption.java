@@ -1,5 +1,6 @@
 package kg.founders.core.entity.rental;
 
+import kg.founders.core.enums.PricingType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -46,6 +47,11 @@ public class ServiceOption {
     /** Цена за день аренды */
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal pricePerDay;
+
+    @Column(length = 20, columnDefinition = "varchar(20) default 'PER_DAY'")
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private PricingType pricingType = PricingType.PER_DAY;
 
     /** Активна ли услуга (можно временно отключить) */
     @Column(nullable = false)

@@ -1,5 +1,6 @@
 package kg.founders.core.model.rental;
 
+import kg.founders.core.enums.PricingType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,5 +34,6 @@ public class PriceBreakdown {
         private final BigDecimal pricePerDay;
         private final int quantity;
         private final BigDecimal total;
+        private final PricingType pricingType;
     }
 }

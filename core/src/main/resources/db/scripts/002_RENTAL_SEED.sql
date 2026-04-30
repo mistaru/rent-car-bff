@@ -245,18 +245,18 @@ SELECT setval('payments_id_seq', 8);
 -- =============================================
 TRUNCATE service_options RESTART IDENTITY CASCADE;
 
-INSERT INTO service_options (id, code, name, description, category, icon, price_per_day, active, sort_order, total_quantity, created_at, updated_at) VALUES
-    (1,  'ROOF_TENT',            'Roof Tent',             'Rooftop tent for comfortable camping on the go',            'EQUIPMENT',  'mdi-tent',                       15.00, TRUE,  1,  5,    NOW(), NOW()),
-    (2,  'GROUND_TENT',          'Ground Tent',           'Spacious ground tent for 2–3 people',                       'EQUIPMENT',  'mdi-home-outline',               10.00, TRUE,  2,  8,    NOW(), NOW()),
-    (3,  'SLEEPING_BAGS',        'Sleeping Bags',         'Warm sleeping bags (set of 2)',                              'EQUIPMENT',  'mdi-bed-outline',                 5.00, TRUE,  3,  15,   NOW(), NOW()),
-    (4,  'KITCHEN_UTENSILS',     'Kitchen Utensils',      'Cooking set: stove, pots, pans, cutlery',                   'EQUIPMENT',  'mdi-silverware-fork-knife',       7.00, TRUE,  4,  10,   NOW(), NOW()),
-    (5,  'REFRIGERATOR',         'Refrigerator',          'Portable car fridge to keep food & drinks cool',            'EQUIPMENT',  'mdi-fridge-outline',              8.00, TRUE,  5,  6,    NOW(), NOW()),
-    (6,  'TABLE_AND_CHAIRS',     'Table & Chairs',        'Foldable camping table and 2 chairs',                       'EQUIPMENT',  'mdi-table-furniture',             6.00, TRUE,  6,  10,   NOW(), NOW()),
-    (7,  'BORDER_DOCUMENTS_KZ',  'Border Docs (KZ)',      'Documents for crossing into Kazakhstan',                    'DOCUMENTS',  'mdi-file-document-outline',      20.00, TRUE,  7,  NULL, NOW(), NOW()),
-    (8,  'BORDER_DOCUMENTS_UZ',  'Border Docs (UZ)',      'Documents for crossing into Uzbekistan',                    'DOCUMENTS',  'mdi-file-document-outline',      20.00, TRUE,  8,  NULL, NOW(), NOW()),
-    (9,  'DELIVERY_OFFICE',      'Pick-up at Office',     'Collect the car from our office (free)',                     'DELIVERY',   'mdi-office-building-marker',      0.00, TRUE,  9,  NULL, NOW(), NOW()),
-    (10, 'DELIVERY_CITY',        'City Delivery',         'We deliver the car to your address in the city',            'DELIVERY',   'mdi-truck-delivery-outline',     15.00, TRUE,  10, NULL, NOW(), NOW()),
-    (11, 'DELIVERY_AIRPORT',     'Airport Delivery',      'We deliver the car to the airport terminal',                'DELIVERY',   'mdi-airplane-marker',            25.00, TRUE,  11, NULL, NOW(), NOW());
+INSERT INTO service_options (id, code, name, description, category, icon, price_per_day, pricing_type, active, sort_order, total_quantity, created_at, updated_at) VALUES
+    (1,  'ROOF_TENT',            'Roof Tent',             'Rooftop tent for comfortable camping on the go',            'EQUIPMENT',  'mdi-tent',                       15.00, 'PER_DAY',  TRUE,  1,  5,    NOW(), NOW()),
+    (2,  'GROUND_TENT',          'Ground Tent',           'Spacious ground tent for 2–3 people',                       'EQUIPMENT',  'mdi-home-outline',               10.00, 'PER_DAY',  TRUE,  2,  8,    NOW(), NOW()),
+    (3,  'SLEEPING_BAGS',        'Sleeping Bags',         'Warm sleeping bags (set of 2)',                              'EQUIPMENT',  'mdi-bed-outline',                 5.00, 'PER_DAY',  TRUE,  3,  15,   NOW(), NOW()),
+    (4,  'KITCHEN_UTENSILS',     'Kitchen Utensils',      'Cooking set: stove, pots, pans, cutlery',                   'EQUIPMENT',  'mdi-silverware-fork-knife',       7.00, 'PER_DAY',  TRUE,  4,  10,   NOW(), NOW()),
+    (5,  'REFRIGERATOR',         'Refrigerator',          'Portable car fridge to keep food & drinks cool',            'EQUIPMENT',  'mdi-fridge-outline',              8.00, 'PER_DAY',  TRUE,  5,  6,    NOW(), NOW()),
+    (6,  'TABLE_AND_CHAIRS',     'Table & Chairs',        'Foldable camping table and 2 chairs',                       'EQUIPMENT',  'mdi-table-furniture',             6.00, 'PER_DAY',  TRUE,  6,  10,   NOW(), NOW()),
+    (7,  'BORDER_DOCUMENTS_KZ',  'Border Docs (KZ)',      'Documents for crossing into Kazakhstan',                    'DOCUMENTS',  'mdi-file-document-outline',      20.00, 'ONE_TIME', TRUE,  7,  NULL, NOW(), NOW()),
+    (8,  'BORDER_DOCUMENTS_UZ',  'Border Docs (UZ)',      'Documents for crossing into Uzbekistan',                    'DOCUMENTS',  'mdi-file-document-outline',      20.00, 'ONE_TIME', TRUE,  8,  NULL, NOW(), NOW()),
+    (9,  'DELIVERY_OFFICE',      'Pick-up at Office',     'Collect the car from our office (free)',                     'DELIVERY',   'mdi-office-building-marker',      0.00, 'ONE_TIME', TRUE,  9,  NULL, NOW(), NOW()),
+    (10, 'DELIVERY_CITY',        'City Delivery',         'We deliver the car to your address in the city',            'DELIVERY',   'mdi-truck-delivery-outline',     15.00, 'ONE_TIME', TRUE,  10, NULL, NOW(), NOW()),
+    (11, 'DELIVERY_AIRPORT',     'Airport Delivery',      'We deliver the car to the airport terminal',                'DELIVERY',   'mdi-airplane-marker',            25.00, 'ONE_TIME', TRUE,  11, NULL, NOW(), NOW());
 
 SELECT setval('service_options_id_seq', 11);
 

@@ -5,6 +5,7 @@ import kg.founders.core.entity.rental.PricingTemplate;
 import kg.founders.core.entity.rental.ServiceOption;
 import kg.founders.core.entity.rental.Vehicle;
 import kg.founders.core.enums.AddOnType;
+import kg.founders.core.enums.PricingType;
 import kg.founders.core.exceptions.BadRequestException;
 import kg.founders.core.exceptions.NotFoundException;
 import kg.founders.core.model.rental.AddOnRequest;
@@ -115,16 +116,27 @@ public class PricingServiceImpl implements PricingService {
                     }
                 }
 
-                BigDecimal addOnTotal = addOnPricePerDay
-                        .multiply(BigDecimal.valueOf(qty))
-                        .multiply(BigDecimal.valueOf(days))
-                        .setScale(2, RoundingMode.HALF_UP);
+                boolean isOneTime = option != null && PricingType.ONE_TIME.equals(option.getPricingType());
+                BigDecimal addOnTotal;
+                if (isOneTime) {
+                    // Единоразовая услуга: цена × количество (без умножения на дни)
+                    addOnTotal = addOnPricePerDay
+                            .multiply(BigDecimal.valueOf(qty))
+                            .setScale(2, RoundingMode.HALF_UP);
+                } else {
+                    // За каждый день: цена × количество × дни
+                    addOnTotal = addOnPricePerDay
+                            .multiply(BigDecimal.valueOf(qty))
+                            .multiply(BigDecimal.valueOf(days))
+                            .setScale(2, RoundingMode.HALF_UP);
+                }
                 addOnItems.add(PriceBreakdown.AddOnPriceItem.builder()
                         .name(displayName)
                         .code(code)
                         .pricePerDay(addOnPricePerDay)
                         .quantity(qty)
                         .total(addOnTotal)
+                        .pricingType(isOneTime ? PricingType.ONE_TIME : PricingType.PER_DAY)
                         .build());
                 addOnsAmount = addOnsAmount.add(addOnTotal);
             }
