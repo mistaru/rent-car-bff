@@ -1,8 +1,8 @@
-name: Build and Deploy Backend (Test)
+name: Build and Deploy Backend (Prod)
 
 on:
   push:
-    branches: [ test ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -33,9 +33,9 @@ jobs:
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.TEST_SERVER_IP }}
+          host: ${{ secrets.PROD_SERVER_IP }}
           username: root
-          key: ${{ secrets.TEST_SERVER_SSH_KEY }}
+          key: ${{ secrets.PROD_SERVER_SSH_KEY }}
           script: |
             cd /app
             docker-compose pull
