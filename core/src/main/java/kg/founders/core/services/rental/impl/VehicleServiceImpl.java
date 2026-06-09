@@ -11,6 +11,7 @@ import kg.founders.core.exceptions.NotFoundException;
 import kg.founders.core.model.rental.VehicleDto;
 import kg.founders.core.model.rental.VehicleSearchRequest;
 import kg.founders.core.repo.BookingDocumentRepository;
+import kg.founders.core.repo.BookingHistoryRepository;
 import kg.founders.core.repo.BookingRepository;
 import kg.founders.core.repo.PaymentRepository;
 import kg.founders.core.repo.VehicleRepository;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 @Slf4j
@@ -36,10 +38,12 @@ public class VehicleServiceImpl implements VehicleService {
     private final LocationRepository locationRepository;
     private final PricingTemplateRepository pricingTemplateRepository;
     private final BookingRepository bookingRepository;
+    private final BookingHistoryRepository bookingHistoryRepository;
     private final PaymentRepository paymentRepository;
     private final BookingDocumentRepository bookingDocumentRepository;
     private final VehicleAttributeServiceImpl vehicleAttributeService;
     private final VehicleConverter vehicleConverter;
+    private final EntityManager entityManager;
 
     @Transactional(readOnly = true)
     @Override
@@ -164,15 +168,19 @@ public class VehicleServiceImpl implements VehicleService {
             throw new NotFoundException("Vehicle not found with id: " + id);
         }
 
-        // Delete all bookings associated with the vehicle (and their payments/documents)
+        // Delete all bookings associated with the vehicle (and their payments/documents/history)
         List<Booking> bookings = bookingRepository.findByVehicleId(id);
         for (Booking booking : bookings) {
+            bookingHistoryRepository.deleteAll(
+                    bookingHistoryRepository.findByBookingIdOrderByCreatedAtDesc(booking.getId()));
             bookingDocumentRepository.deleteAll(
                     bookingDocumentRepository.findByBookingId(booking.getId()));
             paymentRepository.deleteAll(
                     paymentRepository.findByBookingId(booking.getId()));
         }
+        entityManager.flush();
         bookingRepository.deleteAll(bookings);
+        entityManager.flush();
 
         vehicleAttributeService.deleteAttributeValueByVehicleId(id);
         vehicleRepository.deleteById(id);
