@@ -81,6 +81,7 @@ public class PricingTemplateController {
 
     /** Привязать шаблон к автомобилю */
     @ManualPermissionControl
+    @Auditable(entity = "PRICING_TEMPLATE", action = AuditAction.UPDATE)
     @PostMapping("/assign")
     public ResponseEntity<Void> assignToVehicle(
             @RequestParam Long vehicleId,

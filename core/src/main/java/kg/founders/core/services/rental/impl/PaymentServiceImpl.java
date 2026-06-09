@@ -127,6 +127,15 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.delete(payment);
     }
 
+    @Override
+    @Transactional
+    public void deleteAllByBookingId(Long bookingId) {
+        List<Payment> payments = paymentRepository.findByBookingId(bookingId);
+        if (!payments.isEmpty()) {
+            paymentRepository.deleteAll(payments);
+        }
+    }
+
     private PaymentDto handleSuccessfulPayment(Booking booking, Payment payment, String transactionId) {
         // Update payment
         payment.setStatus(PaymentTransactionStatus.SUCCESS);

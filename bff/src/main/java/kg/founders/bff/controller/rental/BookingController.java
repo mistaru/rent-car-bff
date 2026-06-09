@@ -85,4 +85,12 @@ public class BookingController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
         return ResponseEntity.ok(bookingService.getTableCalendarData(from, to));
     }
+
+    @ManualPermissionControl
+    @Auditable(entity = "BOOKING", action = AuditAction.DELETE)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBooking(@AuditEntityId @PathVariable Long id) {
+        bookingService.deleteBooking(id);
+        return ResponseEntity.noContent().build();
+    }
 }

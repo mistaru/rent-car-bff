@@ -29,9 +29,11 @@ public class BookingServiceImpl implements BookingService {
     private final VehicleRepository vehicleRepository;
     private final CustomerRepository customerRepository;
     private final LocationRepository locationRepository;
+    private final BookingHistoryRepository bookingHistoryRepository;
     private final AvailabilityService availabilityService;
     private final PricingService pricingService;
     private final PaymentService paymentService;
+    private final BookingDocumentService bookingDocumentService;
     private final ApplicationEventPublisher eventPublisher;
     private final BookingHistoryService bookingHistoryService;
     private final BookingEmailService bookingEmailService;
@@ -479,5 +481,26 @@ public class BookingServiceImpl implements BookingService {
         });
 
         return new ArrayList<>(rowMap.values());
+    }
+
+    @Override
+    @Transactional
+    public void deleteBooking(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Booking not found with id: " + bookingId));
+
+        // Delete related history (simple DB records — direct repo is fine)
+        bookingHistoryRepository.deleteAll(
+                bookingHistoryRepository.findByBookingIdOrderByCreatedAtDesc(bookingId));
+
+        // Delete documents via service (handles physical file cleanup)
+        bookingDocumentService.deleteAllByBookingId(bookingId);
+
+        // Delete all payments via service
+        paymentService.deleteAllByBookingId(bookingId);
+
+        // Inventory (add-ons) is released automatically since availability is computed dynamically
+        bookingRepository.delete(booking);
+        log.info("Deleted booking id={}", bookingId);
     }
 }

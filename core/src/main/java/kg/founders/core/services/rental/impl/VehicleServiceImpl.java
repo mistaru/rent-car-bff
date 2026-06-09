@@ -2,6 +2,7 @@ package kg.founders.core.services.rental.impl;
 
 import kg.founders.core.converter.rental.VehicleConverter;
 import kg.founders.core.data_access_layer.VehicleSpecifications;
+import kg.founders.core.entity.rental.Booking;
 import kg.founders.core.entity.rental.Location;
 import kg.founders.core.entity.rental.PricingTemplate;
 import kg.founders.core.entity.rental.Vehicle;
@@ -9,6 +10,9 @@ import kg.founders.core.enums.VehicleStatus;
 import kg.founders.core.exceptions.NotFoundException;
 import kg.founders.core.model.rental.VehicleDto;
 import kg.founders.core.model.rental.VehicleSearchRequest;
+import kg.founders.core.repo.BookingDocumentRepository;
+import kg.founders.core.repo.BookingRepository;
+import kg.founders.core.repo.PaymentRepository;
 import kg.founders.core.repo.VehicleRepository;
 import kg.founders.core.repo.LocationRepository;
 import kg.founders.core.repo.PricingTemplateRepository;
@@ -31,6 +35,9 @@ public class VehicleServiceImpl implements VehicleService {
     private final VehicleRepository vehicleRepository;
     private final LocationRepository locationRepository;
     private final PricingTemplateRepository pricingTemplateRepository;
+    private final BookingRepository bookingRepository;
+    private final PaymentRepository paymentRepository;
+    private final BookingDocumentRepository bookingDocumentRepository;
     private final VehicleAttributeServiceImpl vehicleAttributeService;
     private final VehicleConverter vehicleConverter;
 
@@ -156,8 +163,19 @@ public class VehicleServiceImpl implements VehicleService {
         if (!vehicleRepository.existsById(id)) {
             throw new NotFoundException("Vehicle not found with id: " + id);
         }
+
+        // Delete all bookings associated with the vehicle (and their payments/documents)
+        List<Booking> bookings = bookingRepository.findByVehicleId(id);
+        for (Booking booking : bookings) {
+            bookingDocumentRepository.deleteAll(
+                    bookingDocumentRepository.findByBookingId(booking.getId()));
+            paymentRepository.deleteAll(
+                    paymentRepository.findByBookingId(booking.getId()));
+        }
+        bookingRepository.deleteAll(bookings);
+
         vehicleAttributeService.deleteAttributeValueByVehicleId(id);
         vehicleRepository.deleteById(id);
-        log.info("Deleted vehicle id={}", id);
+        log.info("Deleted vehicle id={} with {} associated booking(s)", id, bookings.size());
     }
 }

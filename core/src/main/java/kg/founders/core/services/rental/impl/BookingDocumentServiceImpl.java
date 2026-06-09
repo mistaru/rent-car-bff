@@ -105,6 +105,21 @@ public class BookingDocumentServiceImpl implements BookingDocumentService {
         documentRepository.delete(doc);
     }
 
+    @Transactional
+    @Override
+    public void deleteAllByBookingId(Long bookingId) {
+        List<BookingDocument> docs = documentRepository.findByBookingId(bookingId);
+        for (BookingDocument doc : docs) {
+            Path filePath = Paths.get(uploadDir, String.valueOf(bookingId), doc.getStoredFileName());
+            try {
+                Files.deleteIfExists(filePath);
+            } catch (IOException e) {
+                // log and continue — don't fail entire deletion due to file cleanup
+            }
+        }
+        documentRepository.deleteAll(docs);
+    }
+
     private DocumentDto toDto(BookingDocument d) {
         return new DocumentDto(d.getId(), d.getFileName(), d.getContentType(),
                 d.getDocumentType().name(), d.getFileSize(), d.getUploadedBy(),

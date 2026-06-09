@@ -15,6 +15,8 @@ import java.util.Optional;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
+    List<Booking> findByVehicleId(Long vehicleId);
+
     @Query("SELECT b FROM Booking b " +
             "JOIN FETCH b.vehicle " +
             "JOIN FETCH b.customer " +

@@ -30,4 +30,7 @@ public interface BookingService {
 
     @Transactional(readOnly = true)
     List<BookingTableCalendarRow> getTableCalendarData(LocalDate from, LocalDate to);
+
+    @Transactional
+    void deleteBooking(Long bookingId);
 }

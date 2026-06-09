@@ -22,4 +22,8 @@ public interface BookingDocumentService {
 
     @Transactional
     void delete(Long bookingId, Long documentId) throws IOException;
+
+    /** Удаляет все документы бронирования (включая файлы с диска) */
+    @Transactional
+    void deleteAllByBookingId(Long bookingId);
 }
