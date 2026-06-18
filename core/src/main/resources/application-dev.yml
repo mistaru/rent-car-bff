@@ -22,5 +22,6 @@ server:
 
 app:
   images:
-    storage-dir: ./uploads/images
-    base-url: http://localhost:8081/uploads/images
+    storage-dir: /app/images
+    base-url: http://178.104.61.164/images
+
