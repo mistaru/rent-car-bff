@@ -7,3 +7,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+app:
+  images:
+    storage-dir: /app/images
+    base-url: http://178.104.61.164/images
+

@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
+
 @Entity
 @Table(name = "vehicles", indexes = {
         @Index(name = "idx_vehicle_status", columnList = "status"),
@@ -37,9 +39,6 @@ public class Vehicle {
 
     @Column(nullable = false)
     private String licensePlate;
-
-    @Column(length = 1024)
-    private String image;
 
     private String carClass;
 
@@ -67,5 +66,6 @@ public class Vehicle {
 
     @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("sortOrder ASC")
+    @BatchSize(size = 20)
     private List<VehicleImage> images = new ArrayList<>();
 }

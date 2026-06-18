@@ -1,5 +1,6 @@
 package kg.founders.core.converter.rental;
 
+import kg.founders.core.config.ImageStorageProperties;
 import kg.founders.core.converter.ModelConverter;
 import kg.founders.core.entity.rental.VehicleImage;
 import kg.founders.core.model.rental.VehicleImageDto;
@@ -11,6 +12,9 @@ import javax.annotation.PostConstruct;
 @Component
 @RequiredArgsConstructor
 public class VehicleImageConverter extends ModelConverter<VehicleImageDto, VehicleImage> {
+
+    private final ImageStorageProperties imageProps;
+
     @PostConstruct
     public void init() {
         this.fromEntity = this::toVehicleImageDto;
@@ -21,11 +25,11 @@ public class VehicleImageConverter extends ModelConverter<VehicleImageDto, Vehic
         return VehicleImageDto.builder()
                 .id(image.getId())
                 .vehicleId(image.getVehicle().getId())
-                .filename(image.getFilename())
+                .filename(image.getOriginalFilename())
                 .mimeType(image.getMimeType())
                 .main(image.isMain())
                 .sortOrder(image.getSortOrder())
-                .url("/api/v1/vehicle-images/" + image.getId() + "/data")
+                .url(imageProps.getBaseUrl() + "/" + image.getStorageFilename())
                 .build();
     }
 }

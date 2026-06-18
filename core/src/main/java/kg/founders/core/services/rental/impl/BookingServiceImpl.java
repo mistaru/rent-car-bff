@@ -1,5 +1,6 @@
 package kg.founders.core.services.rental.impl;
 
+import kg.founders.core.config.ImageStorageProperties;
 import kg.founders.core.converter.rental.BookingConverter;
 import kg.founders.core.entity.rental.*;
 import kg.founders.core.enums.*;
@@ -37,6 +38,7 @@ public class BookingServiceImpl implements BookingService {
     private final ApplicationEventPublisher eventPublisher;
     private final BookingHistoryService bookingHistoryService;
     private final BookingEmailService bookingEmailService;
+    private final ImageStorageProperties imageProps;
     private final ServiceOptionService serviceOptionService;
     private final BookingConverter bookingConverter;
 
@@ -175,7 +177,16 @@ public class BookingServiceImpl implements BookingService {
                     return BookingCalendarItem.builder()
                             .id(b.getId())
                             .vehicleName(b.getVehicle().getBrand() + " " + b.getVehicle().getModel())
-                            .vehicleImage(b.getVehicle().getImage())
+                            .vehicleImage(
+                                    b.getVehicle().getImages() != null
+                                            ? b.getVehicle().getImages().stream()
+                                            .filter(VehicleImage::isMain)
+                                            .findFirst()
+                                            .or(() -> b.getVehicle().getImages().stream().findFirst())
+                                            .map(img -> imageProps.getBaseUrl() + "/" + img.getStorageFilename())
+                                            .orElse(null)
+                                            : null
+                            )
                             .carClass(b.getVehicle().getCarClass())
                             .customerName(b.getCustomer().getFullName())
                             .pickupDate(b.getPickupDate().toString())

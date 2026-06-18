@@ -23,22 +23,15 @@ public class VehicleDto {
     private BigDecimal pricePerDay;
     /** Минимальная цена из тарифного шаблона (для каталога — «от X $») */
     private BigDecimal minPricePerDay;
-    private String image;
     private String status;
     private String carClass;
     private String pricingTemplateName;
     private Long pricingTemplateId;
     private Long locationId;
 
-    private List<VehicleImageDto> images;
+    /** URL-ы изображений (для фронтенда) */
+    private List<String> images;
 
     /** Dynamic vehicle attributes: code -> value, e.g. {"SEATS": "5", "COLOR": "Black"} */
     private Map<String, String> attributes;
-
-    public List<String> getImages() {
-        if (images == null || images.isEmpty()) return List.of();
-        return images.stream()
-                .map(VehicleImageDto::getUrl)
-                .collect(java.util.stream.Collectors.toList());
-    }
 }

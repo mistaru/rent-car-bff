@@ -1,12 +1,9 @@
 package kg.founders.bff.controller.rental;
 
-import kg.founders.core.entity.rental.VehicleImage;
 import kg.founders.core.model.rental.VehicleImageDto;
 import kg.founders.core.services.rental.VehicleImageService;
 import kg.founders.core.settings.security.permission.annotation.ManualPermissionControl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VehicleImageController {
 
-    private final VehicleImageService imageService    ;
+    private final VehicleImageService imageService;
 
     /** Список мета-данных по авто */
     @ManualPermissionControl
@@ -28,16 +25,6 @@ public class VehicleImageController {
         return ResponseEntity.ok(imageService.getImagesByVehicleId(vehicleId));
     }
 
-    /** Отдать бинарник (используется как <img :src="...">) */
-    @ManualPermissionControl
-    @GetMapping("/{id}/data")
-    public ResponseEntity<byte[]> getData(@PathVariable Long id) {
-        VehicleImage image = imageService.getRawById(id);
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(image.getMimeType()))
-                .header(HttpHeaders.CACHE_CONTROL, "max-age=86400")
-                .body(image.getData());
-    }
 
     /** Загрузить новое фото */
     @ManualPermissionControl

@@ -19,3 +19,8 @@ logging:
 
 server:
   port: 8081
+
+app:
+  images:
+    storage-dir: ./uploads/images
+    base-url: http://localhost:8081/uploads/images

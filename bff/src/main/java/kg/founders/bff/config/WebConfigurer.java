@@ -3,6 +3,7 @@ package kg.founders.bff.config;
 import com.google.gson.Gson;
 import kg.founders.bff.config.settings.grant.GrantService;
 import kg.founders.bff.config.settings.perms.PermissionAccessHandler;
+import kg.founders.core.config.ImageStorageProperties;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,7 @@ import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Collections;
@@ -26,6 +28,7 @@ public class WebConfigurer implements WebMvcConfigurer {
 
     Gson gson;
     GrantService grantService;
+    ImageStorageProperties imageStorageProperties;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -58,5 +61,14 @@ public class WebConfigurer implements WebMvcConfigurer {
                 gson,
                 SecurityConfig.PUBLIC_URLS
         ));
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // Раздача изображений для локальной разработки (на проде — nginx)
+        String storageDir = imageStorageProperties.getStorageDir();
+        registry.addResourceHandler("/uploads/images/**")
+                .addResourceLocations("file:" + storageDir + "/")
+                .setCachePeriod(86400);
     }
 }

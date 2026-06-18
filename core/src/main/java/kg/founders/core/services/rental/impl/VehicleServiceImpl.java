@@ -65,7 +65,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Transactional(readOnly = true)
     @Override
     public VehicleDto getVehicleById(Long id) {
-        Vehicle vehicle = vehicleRepository.findById(id)
+        Vehicle vehicle = vehicleRepository.findByIdWithImages(id)
                 .orElseThrow(() -> new NotFoundException("Vehicle not found with id: " + id));
         VehicleDto dto = vehicleConverter.convertFromEntity(vehicle);
         // Enrich with dynamic attributes
@@ -76,7 +76,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Transactional(readOnly = true)
     @Override
     public List<VehicleDto> getAllVehicles() {
-        List<Vehicle> vehicles = vehicleRepository.findAll(Sort.by("id").descending());
+        List<Vehicle> vehicles = vehicleRepository.findAllWithImages();
         List<VehicleDto> vehicleDtos = vehicles.stream().map(vehicleConverter::convertFromEntity).toList();
         // Enrich with dynamic attributes
         vehicleDtos.forEach(vehicleDto ->
@@ -95,7 +95,6 @@ public class VehicleServiceImpl implements VehicleService {
                 .brand(dto.getBrand())
                 .model(dto.getModel())
                 .licensePlate(dto.getLicensePlate())
-                .image(dto.getImage())
                 .carClass(dto.getCarClass())
                 .pricePerDay(dto.getPricePerDay())
                 .minPricePerDay(dto.getMinPricePerDay())
@@ -128,7 +127,6 @@ public class VehicleServiceImpl implements VehicleService {
         vehicle.setBrand(dto.getBrand());
         vehicle.setModel(dto.getModel());
         if (dto.getLicensePlate() != null) vehicle.setLicensePlate(dto.getLicensePlate());
-        vehicle.setImage(dto.getImage());
         vehicle.setCarClass(dto.getCarClass());
         vehicle.setPricePerDay(dto.getPricePerDay());
         if (dto.getMinPricePerDay() != null) vehicle.setMinPricePerDay(dto.getMinPricePerDay());

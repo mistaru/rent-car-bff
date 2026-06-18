@@ -28,14 +28,18 @@ public class VehicleImage {
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
 
-    @Column(name = "data", nullable = false, columnDefinition = "bytea")
-    private byte[] data;
+    /** Имя файла на диске (хранится в /app/images/). После миграции — NOT NULL. */
+    @Column(name = "storage_filename", length = 512)
+    private String storageFilename;
 
     @Column(name = "mime_type", nullable = false, length = 50)
     private String mimeType;
 
-    @Column(name = "filename", length = 255)
-    private String filename;
+    @Column(name = "original_filename", length = 255)
+    private String originalFilename;
+
+    @Column(name = "file_size")
+    private Long fileSize;
 
     @Column(name = "is_main", nullable = false)
     private boolean main = false;

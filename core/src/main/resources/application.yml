@@ -53,6 +53,9 @@ spring:
     default-encoding: UTF-8
 
 app:
+  images:
+    storage-dir: ${IMAGES_DIR:./uploads/images}
+    base-url: ${IMAGES_BASE_URL:http://178.105.184.173/images}
   mail:
     from: ${MAIL_USERNAME:}
     admin-email: admin@ironhorseasia.com

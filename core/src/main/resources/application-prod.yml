@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/rent_car}
-    username: ${SPRING_DATASOURCE_USERNAME:rent_car}
-    password: ${SPRING_DATASOURCE_PASSWORD:qwerty1234}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5434/rentcar}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:FounderProd2026!}
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 12000
@@ -34,3 +34,9 @@ spring:
 
 server:
   port: ${PORT:8080}
+
+app:
+  images:
+    storage-dir: /app/images
+    base-url: http://178.105.184.173/images
+

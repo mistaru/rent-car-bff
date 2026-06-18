@@ -8,7 +8,6 @@ import kg.founders.core.repo.VehicleImageRepository;
 import kg.founders.core.repo.VehicleRepository;
 import kg.founders.core.services.rental.VehicleImageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +24,7 @@ public class VehicleImageServiceImpl implements VehicleImageService {
     private final VehicleImageRepository vehicleImageRepository;
     private final VehicleRepository vehicleRepository;
     private final VehicleImageConverter vehicleImageConverter;
+    private final ImageStorageService imageStorageService;
 
     private static final List<String> ALLOWED_TYPES = List.of("image/jpeg", "image/png", "image/webp");
     private static final long MAX_SIZE = 10 * 1024 * 1024; // 10MB
@@ -32,7 +32,10 @@ public class VehicleImageServiceImpl implements VehicleImageService {
     @Transactional(readOnly = true)
     @Override
     public List<VehicleImageDto> getImagesByVehicleId(Long vehicleId) {
-        return vehicleImageRepository.findByVehicleIdOrderBySortOrderAsc(vehicleId).stream().map(vehicleImageConverter::convertFromEntity).collect(Collectors.toList());
+        return vehicleImageRepository.findByVehicleIdOrderBySortOrderAsc(vehicleId)
+                .stream()
+                .map(vehicleImageConverter::convertFromEntity)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -45,13 +48,14 @@ public class VehicleImageServiceImpl implements VehicleImageService {
     @Transactional
     @Override
     public void delete(Long imageId) {
-        try {
-            vehicleImageRepository.deleteById(imageId);
-        } catch (EmptyResultDataAccessException ex) {
-            throw new EntityNotFoundException("Vehicle's image not found with id: " + imageId);
-        }
+        VehicleImage image = vehicleImageRepository.findById(imageId)
+                .orElseThrow(() -> new EntityNotFoundException("Image not found: " + imageId));
+        // Удалить файл с диска
+        imageStorageService.delete(image.getStorageFilename());
+        vehicleImageRepository.delete(image);
     }
 
+    @Transactional
     @Override
     public VehicleImageDto upload(Long vehicleId, MultipartFile file, boolean isMain) throws IOException {
         if (file.isEmpty()) throw new IllegalArgumentException("File is empty");
@@ -71,13 +75,17 @@ public class VehicleImageServiceImpl implements VehicleImageService {
                     .forEach(img -> { img.setMain(false); vehicleImageRepository.save(img); });
         }
 
+        // Сохранить файл на диск
+        String storageFilename = imageStorageService.store(vehicleId, file);
+
         int nextOrder = vehicleImageRepository.findByVehicleIdOrderBySortOrderAsc(vehicleId).size();
 
         VehicleImage image = VehicleImage.builder()
                 .vehicle(vehicle)
-                .data(file.getBytes())
+                .storageFilename(storageFilename)
                 .mimeType(mimeType)
-                .filename(file.getOriginalFilename())
+                .originalFilename(file.getOriginalFilename())
+                .fileSize(file.getSize())
                 .main(isMain)
                 .sortOrder(nextOrder)
                 .build();
