@@ -343,16 +343,22 @@ public class BookingServiceImpl implements BookingService {
             bookingHistoryService.logFieldChange(booking, "CUSTOMER_UPDATED", "fullName", old, request.getCustomerFullName(), "system");
             customerChanged = true;
         }
-        if (request.getCustomerEmail() != null && !request.getCustomerEmail().equals(customer.getEmail())) {
+        // null = не менять, пустая строка = очистить поле (хранится как null)
+        String newEmail = request.getCustomerEmail() != null ? normalizeContact(request.getCustomerEmail()) : customer.getEmail();
+        String newPhone = request.getCustomerPhone() != null ? normalizeContact(request.getCustomerPhone()) : customer.getPhone();
+        if (newEmail == null && newPhone == null) {
+            throw new BadRequestException("Either email or phone is required");
+        }
+        if (!Objects.equals(newEmail, customer.getEmail())) {
             String old = customer.getEmail();
-            customer.setEmail(request.getCustomerEmail());
-            bookingHistoryService.logFieldChange(booking, "CUSTOMER_UPDATED", "email", old, request.getCustomerEmail(), "system");
+            customer.setEmail(newEmail);
+            bookingHistoryService.logFieldChange(booking, "CUSTOMER_UPDATED", "email", old, newEmail, "system");
             customerChanged = true;
         }
-        if (request.getCustomerPhone() != null && !request.getCustomerPhone().equals(customer.getPhone())) {
+        if (!Objects.equals(newPhone, customer.getPhone())) {
             String old = customer.getPhone();
-            customer.setPhone(request.getCustomerPhone());
-            bookingHistoryService.logFieldChange(booking, "CUSTOMER_UPDATED", "phone", old, request.getCustomerPhone(), "system");
+            customer.setPhone(newPhone);
+            bookingHistoryService.logFieldChange(booking, "CUSTOMER_UPDATED", "phone", old, newPhone, "system");
             customerChanged = true;
         }
         if (request.getCustomerAdditionalInfo() != null && !request.getCustomerAdditionalInfo().equals(customer.getAdditionalInfo())) {
@@ -438,6 +444,10 @@ public class BookingServiceImpl implements BookingService {
         log.info("Booking {} updated. datesChanged={}", bookingId, datesChanged);
 
         return bookingConverter.convertFromEntity(booking);
+    }
+
+    private String normalizeContact(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 
     private void validateDates(LocalDate pickupDate, LocalDate dropoffDate) {

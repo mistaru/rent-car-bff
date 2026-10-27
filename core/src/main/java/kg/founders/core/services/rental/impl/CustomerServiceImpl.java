@@ -23,12 +23,15 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional
     @Override
     public CustomerDto createCustomer(CreateCustomerRequest request) {
-        // Если клиент с таким email уже существует — вернуть его
-        var existing = customerRepository.findByEmail(request.getEmail());
-        if (existing.isPresent()) {
-            log.info("Customer with email {} already exists, returning existing id: {}",
-                    request.getEmail(), existing.get().getId());
-            return (CustomerDto) customerConverter.convertFromEntity(existing.get());
+        // Если клиент с таким email уже существует — вернуть его.
+        // Без email дедупликации нет: телефон не уникален, поэтому создаётся новый клиент
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            var existing = customerRepository.findByEmail(request.getEmail().trim());
+            if (existing.isPresent()) {
+                log.info("Customer with email {} already exists, returning existing id: {}",
+                        request.getEmail(), existing.get().getId());
+                return (CustomerDto) customerConverter.convertFromEntity(existing.get());
+            }
         }
         Customer customer = customerConverter.convertFromModel(request);
         customer = customerRepository.save(customer);

@@ -36,6 +36,11 @@ public class BookingEmailServiceImpl implements BookingEmailService {
 
     @Async
     public void sendBookingConfirmation(Booking booking) {
+        String customerEmail = booking.getCustomer().getEmail();
+        if (customerEmail == null || customerEmail.isBlank()) {
+            log.info("Booking {}: customer has no email, confirmation email skipped", booking.getId());
+            return;
+        }
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
@@ -124,8 +129,8 @@ public class BookingEmailServiceImpl implements BookingEmailService {
             """,
                 booking.getId(),
                 booking.getCustomer().getFullName(),
-                booking.getCustomer().getEmail(),
-                booking.getCustomer().getPhone(),
+                orDash(booking.getCustomer().getEmail()),
+                orDash(booking.getCustomer().getPhone()),
                 booking.getVehicle().getBrand(),
                 booking.getVehicle().getModel(),
                 pickupDate,
@@ -133,6 +138,10 @@ public class BookingEmailServiceImpl implements BookingEmailService {
                 addOns,
                 booking.getTotalAmount()
         );
+    }
+
+    private String orDash(String value) {
+        return value == null || value.isBlank() ? "—" : value;
     }
 
     private String formatAddOns(List<String> addOns) {

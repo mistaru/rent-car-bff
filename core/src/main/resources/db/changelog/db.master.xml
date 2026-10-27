@@ -31,4 +31,26 @@
         </sql>
     </changeSet>
 
+    <!-- Email клиента необязателен: достаточно email или телефона -->
+    <changeSet id="2" author="atabyldyev" context="liqui-dev">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="customers"/>
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM pg_constraint WHERE conname = 'chk_customer_contact'
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            ALTER TABLE customers ALTER COLUMN email DROP NOT NULL;
+        </sql>
+        <sql>
+            UPDATE customers SET email = NULL WHERE trim(email) = '';
+        </sql>
+        <sql>
+            UPDATE customers SET phone = NULL WHERE trim(phone) = '';
+        </sql>
+        <sql>
+            ALTER TABLE customers ADD CONSTRAINT chk_customer_contact CHECK (email IS NOT NULL OR phone IS NOT NULL);
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

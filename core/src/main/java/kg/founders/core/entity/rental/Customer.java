@@ -26,9 +26,11 @@ public class Customer {
     @Column(nullable = false)
     private String fullName;
 
-    @Column(nullable = false, unique = true)
+    // Email или телефон должен быть заполнен (проверяется в сервисе и CHECK-констрейнтом в БД)
+    @Column(unique = true)
     private String email;
 
+    // Не уникален: номера могут быть из разных стран и повторяться у разных клиентов
     private String phone;
 
     @Column(length = 1024)

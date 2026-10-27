@@ -32,9 +32,14 @@ public class CustomerConverter extends ModelConverter<CustomerData, Customer> {
     private Customer toCustomerEntity(CustomerData request) {
         return Customer.builder()
                 .fullName(request.getFullName())
-                .email(request.getEmail())
-                .phone(request.getPhone())
+                .email(blankToNull(request.getEmail()))
+                .phone(blankToNull(request.getPhone()))
                 .additionalInfo(request.getAdditionalInfo())
                 .build();
+    }
+
+    // Пустая строка в уникальной колонке email ломала бы уникальность, поэтому храним null
+    private String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 }
